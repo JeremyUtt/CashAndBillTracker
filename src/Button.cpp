@@ -2,16 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
-Button::Button(/* args */) {
-    this->xPos = 0;
-    this->yPos = 0;
-    this->width = 100;
-    this->height = 50;
-    this->active = true;
-    this->hasText = false;
-    this->hovered = false;
-}
-Button::Button(int x, int y, int width, int height) {
+Button::Button(int x, int y, int width, int height, const buttonFunction& func){
     this->xPos = x;
     this->yPos = y;
     this->width = width;
@@ -19,6 +10,7 @@ Button::Button(int x, int y, int width, int height) {
     this->active = true;
     this->hasText = false;
     this->hovered = false;
+    this->func = func;
 }
 
 bool Button::updateHoverStatus(int mouseX, int mouseY) {
@@ -61,4 +53,8 @@ void Button::setText(std::string string, sf::Font& font, int fontSize) {
     int textX = xPos + (width / 2) - (this->text.getLocalBounds().width / 2);
     int textY = yPos + (height / 2) - (this->text.getLocalBounds().height / 2);
     this->text.setPosition(sf::Vector2f(textX, textY));
+}
+
+void Button::callFunc(){
+    func();
 }

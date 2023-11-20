@@ -2,6 +2,10 @@
 #define BUTTON_H
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <functional>
+
+typedef std::function<void()> buttonFunction;
+
 class Button {
 private:
     int xPos;
@@ -12,14 +16,15 @@ private:
     bool hasText;
     bool hovered;
     sf::Text text;
+    buttonFunction func;
 
 public:
-    Button();
-    Button(int x, int y, int width, int height);
+    Button(int x, int y, int width, int height, const buttonFunction& func);
     bool updateHoverStatus(int mouseX, int mouseY);
     void render(sf::RenderWindow& window, sf::Font& textFont);
     void setActiveStatus(bool status);
     void setText(std::string text, sf::Font& font, int fontSize);
+    void callFunc();
 };
 
 #endif

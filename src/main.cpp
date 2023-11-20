@@ -6,9 +6,15 @@
 #include "Button.h"
 #include "Item.h"
 #include "User.h"
-
 using namespace std;
+
 void renderWindow();
+void handleEvents(sf::RenderWindow& window, vector<Button*> buttons);
+
+void testing() {
+    cout << "Hello world!" << endl;
+}
+
 int main() {
     cout << "Hello World!" << endl;
     vector<Item*> items;
@@ -31,7 +37,6 @@ int main() {
 
     cout << drP.getName() << endl;
     cout << drP.getTotalPrice() << endl;
-
     renderWindow();
 }
 
@@ -43,22 +48,24 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons) {
             case sf::Event::Closed:
                 window.close();
                 break;
+
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     for (size_t i = 0; i < buttons.size(); i++) {
                         if (buttons.at(i)->updateHoverStatus(event.mouseButton.x, event.mouseButton.y)) {
-                            // cout << "Button Pressed" << endl;
+                            buttons.at(i)->callFunc();
                         }
                     }
-                    // cout << "Left mouse button pressed" << endl;
                 }
                 break;
+
             case sf::Event::MouseMoved:
                 // cout << "Hello world" << endl;
                 for (size_t i = 0; i < buttons.size(); i++) {
                     buttons.at(i)->updateHoverStatus(event.mouseMove.x, event.mouseMove.y);
                 }
                 break;
+
             case sf::Event::Resized:
                 visibleArea.left = 0;
                 visibleArea.top = 0;
@@ -66,6 +73,7 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons) {
                 visibleArea.height = event.size.height;
                 window.setView(sf::View(visibleArea));
                 break;
+
             default:
                 break;
         }
@@ -79,7 +87,7 @@ void renderWindow() {
     sf::View view = window.getDefaultView();
 
     sf::Font notoSans;
-    if (!notoSans.loadFromFile("/home/jeremy/dev/C++/CBT/NotoSans-Bold.ttf")) {
+    if (!notoSans.loadFromFile("./NotoSans-Bold.ttf")) {
         exit(-1);
     }
 
@@ -89,8 +97,9 @@ void renderWindow() {
     titleScreenText.setFillColor(sf::Color::White);
     titleScreenText.setCharacterSize(30);
     titleScreenText.setPosition(20, 20);
-    Button pog(50, 70, 200, 100);
-    Button pog2(300, 0, 100, 500);
+    Button pog(50, 70, 200, 100, testing);
+
+    Button pog2(300, 0, 100, 500, testing);
     pog.setText("Pog", notoSans, 20);
     pog2.setText("Pog2", notoSans, 20);
     buttons.push_back(&pog);
