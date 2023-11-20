@@ -37,7 +37,70 @@ int main() {
 
     cout << drP.getName() << endl;
     cout << drP.getTotalPrice() << endl;
+
+    cout << "Enter name of person Buying: ";
+    string name;
+    cin >> name;
+    User* buyer = new User(name, true);
+    users.push_back(buyer);
+    while (true) {
+        cout << "Enter next users name: (or q to quit)";
+        cin >> name;
+        if (name == "q") {
+            break;
+        }
+
+        User* user = new User(name, false);
+        users.push_back(user);
+    }
+
+    while (true) {
+        cout << "Enter Name of Product (or q to quit):";
+        string input;
+        cin >> input;
+
+        if (input == "q") {
+            break;
+        }
+
+        cout << "Enter Price:";
+        double price;
+        cin >> price;
+
+        cout << "Enter Quantity:";
+        int quantity;
+        cin >> quantity;
+
+        Item* item = new Item(input, price, quantity);
+        items.push_back(item);
+
+        for (size_t i = 0; i < users.size(); i++) {
+            cout << "is User " << users.at(i)->getName() << " Buying this: ";
+            cin >> input;
+            if (input == "y" || input == "Y") {
+                users.at(i)->addItem(item);
+            }
+        }
+    }
+
+    // for (size_t i = 0; i < items.size(); i++) {
+    //     cout << items.at(i)->getName() << endl;
+    // }
+
+
+    for (size_t i = 0; i < users.size(); i++)
+    {
+        cout << users[i]->getName() << ":" << endl;
+        vector<Item*> addedItems = users[i]->getAddedItems();
+        for (size_t j = 0; j < addedItems.size(); j++)
+        {
+            cout << "   " << addedItems[j]->getName() << endl;
+        }
+    }
+    
+
     renderWindow();
+    return 0;
 }
 
 void handleEvents(sf::RenderWindow& window, vector<Button*> buttons) {
@@ -107,10 +170,10 @@ void renderWindow() {
 
     while (window.isOpen()) {
         handleEvents(window, buttons);
-        window.clear(sf::Color(0x18, 0x1a, 0x1b));
+        window.clear(sf::Color(0x181a1b00));
         window.draw(titleScreenText);
-        pog.render(window, notoSans);
-        pog2.render(window, notoSans);
+        pog.render(window);
+        pog2.render(window);
         window.display();
     }
 }

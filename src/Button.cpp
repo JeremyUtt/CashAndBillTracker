@@ -28,7 +28,7 @@ bool Button::updateHoverStatus(int mouseX, int mouseY) {
     return false;
 }
 
-void Button::render(sf::RenderWindow& window, sf::Font& textFont) {
+void Button::render(sf::RenderWindow& window) {
     const int borderWidth = 1;
     auto drawObject = sf::RectangleShape(sf::Vector2f(width, height));
     drawObject.setPosition(sf::Vector2f(xPos, yPos));

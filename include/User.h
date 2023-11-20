@@ -6,9 +6,9 @@
 class User
 {
 private:
-    std::string name;
-    bool isBuyer;
-    std::vector<Item*> items;
+    std::string name_;
+    bool isBuyer_;
+    std::vector<Item*> items_;
 public:
     User();
     User(std::string name, bool isBuyer);

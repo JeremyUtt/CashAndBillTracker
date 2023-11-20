@@ -23,7 +23,7 @@ void Item::setName(std::string name) {
 }
 
 std::string Item::getName() {
-    return name;
+    return this->name;
 }
 
 void Item::setPricePerQuantity(float pricePerQuantity) {

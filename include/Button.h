@@ -21,7 +21,7 @@ private:
 public:
     Button(int x, int y, int width, int height, const buttonFunction& func);
     bool updateHoverStatus(int mouseX, int mouseY);
-    void render(sf::RenderWindow& window, sf::Font& textFont);
+    void render(sf::RenderWindow& window);
     void setActiveStatus(bool status);
     void setText(std::string text, sf::Font& font, int fontSize);
     void callFunc();

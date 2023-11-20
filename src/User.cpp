@@ -4,10 +4,12 @@ User::User() {
 }
 
 User::User(std::string name, bool isBuyer) {
+    this->name_ = name;
+    this->isBuyer_ = isBuyer;
 }
 
 void User::addItem(Item* item) {
-    items.push_back(item);
+    items_.push_back(item);
 }
 
 void User::removeItem(Item* item) {
@@ -16,30 +18,30 @@ void User::removeItem(Item* item) {
 
 int User::calcuateTotal() {
     int sum;
-    for (size_t i = 0; i < items.size(); i++)
+    for (size_t i = 0; i < items_.size(); i++)
     {
-        sum += items[i]->getTotalPrice();
+        sum += items_[i]->getTotalPrice();
     }
     return sum;
 }
 
 void User::setName(std::string name) {
-    this->name = name;
+    this->name_ = name;
 }
 
 std::string User::getName() {
-    return name;
+    return name_;
 }
 
 void User::setBuyerStatus(bool isBuyer) {
-    this->isBuyer = isBuyer;
+    this->isBuyer_ = isBuyer;
 }
 
 bool User::getBuyerStatus() {
-    return isBuyer;
+    return isBuyer_;
 }
 
 std::vector<Item* > User::getAddedItems() {
-    return items;
+    return items_;
 }
 
