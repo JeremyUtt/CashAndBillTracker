@@ -45,3 +45,15 @@ int Item::getQuantity() {
 float Item::getTotalPrice() {
     return pricePerQuantity * quantity;
 }
+
+void Item::addUser(User* user) {
+    users_.push_back(user);
+}
+
+std::vector<User*> Item::getAddedUsers(){
+    return users_;
+}
+
+double Item::pricePerPerson(){
+    return getTotalPrice() / users_.size();
+}

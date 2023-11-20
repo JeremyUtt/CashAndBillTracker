@@ -20,24 +20,6 @@ int main() {
     vector<Item*> items;
     vector<User*> users;
 
-    Item* coke = new Item;
-    coke->setName("Diet Cock");
-    coke->setQuantity(69);
-    coke->setPricePerQuantity(4.20);
-    items.push_back(coke);
-    cout << coke->getName() << endl;
-
-    Item realCoke = *coke;
-    cout << realCoke.getName() << endl;
-
-    cout << items[0]->getName() << endl;
-    cout << items[0]->getTotalPrice() << endl;
-
-    Item drP("Dr Pepper", 5, 50);
-
-    cout << drP.getName() << endl;
-    cout << drP.getTotalPrice() << endl;
-
     cout << "Enter name of person Buying: ";
     string name;
     cin >> name;
@@ -60,6 +42,7 @@ int main() {
         cin >> input;
 
         if (input == "q") {
+            cout << endl;
             break;
         }
 
@@ -75,29 +58,25 @@ int main() {
         items.push_back(item);
 
         for (size_t i = 0; i < users.size(); i++) {
-            cout << "is User " << users.at(i)->getName() << " Buying this: ";
+            cout << "is User " << users[i]->getName() << " Buying this: ";
             cin >> input;
             if (input == "y" || input == "Y") {
-                users.at(i)->addItem(item);
+                item->addUser(users[i]);
             }
         }
     }
 
-    // for (size_t i = 0; i < items.size(); i++) {
-    //     cout << items.at(i)->getName() << endl;
-    // }
-
-
-    for (size_t i = 0; i < users.size(); i++)
-    {
-        cout << users[i]->getName() << ":" << endl;
-        vector<Item*> addedItems = users[i]->getAddedItems();
-        for (size_t j = 0; j < addedItems.size(); j++)
-        {
-            cout << "   " << addedItems[j]->getName() << endl;
+    for (size_t i = 0; i < items.size(); i++) {
+        auto addedUsers = items[i]->getAddedUsers();
+        auto price = items[i]->pricePerPerson();
+        for (size_t j = 0; j < addedUsers.size(); j++) {
+            addedUsers[j]->setTotal(addedUsers[j]->getTotal() + price);
         }
     }
-    
+
+    for (size_t i = 0; i < users.size(); i++) {
+        cout << users[i]->getName() << ": " << users[i]->getTotal() << endl;
+    }
 
     renderWindow();
     return 0;
