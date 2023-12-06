@@ -12,32 +12,22 @@ using namespace std;
 void renderWindow(vector<User*>& users, vector<Item*>& items);
 void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, ButtonLink buyTable);
 
-void testing() {
-    cout << "Hello world!" << endl;
-}
-
 void toggleButton(Button* button, ButtonLink link) {
-    cout << "Hello world! cbtcbrtcbtbf" << endl;
-
     auto color1 = sf::Color(0x227335ff);
     auto color2 = sf::Color(0xa60d2cff);
+
     if (button->getColor() == color1) {
         button->setColor(color2);
-        if(link.item != nullptr && link.user != nullptr){
-            link.item->removeUser(link.user);
-        }
+        link.item->removeUser(link.user);
+
     } else {
         button->setColor(color1);
-        if(link.item != nullptr && link.user != nullptr){
-            link.item->addUser(link.user);
-        }
+        link.item->addUser(link.user);
     }
-
 
 }
 
 int main() {
-    cout << "Hello World!" << endl;
     vector<Item*> items;
     vector<User*> users;
 
@@ -82,7 +72,7 @@ int main() {
             cout << "is User " << users[i]->getName() << " Buying this: ";
             cin >> input;
             if (input == "y" || input == "Y") {
-                item->addUser(users[i]);
+                // item->addUser(users[i]);
             }
         }
     }
@@ -103,7 +93,7 @@ int main() {
     return 0;
 }
 
-void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, ButtonLink* buyTable) {
+void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<ButtonLink> buyTable) {
     sf::Event event;
     while (window.pollEvent(event)) {
         sf::FloatRect visibleArea;
@@ -117,7 +107,6 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, ButtonLink*
                     for (size_t i = 0; i < buttons.size(); i++) {
                         if (buttons.at(i)->updateHoverStatus(event.mouseButton.x, event.mouseButton.y)) {
                             buttons.at(i)->callFunc(buyTable[i]);
-            
                         }
                     }
                 }
@@ -144,14 +133,11 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, ButtonLink*
     }
 }
 
-
-
-
 void renderWindow(vector<User*>& users, vector<Item*>& items) {
     vector<Button*> buttons;
-    
+
     sf::RenderWindow window(sf::VideoMode(1280, 720, 32), "Cost and Bill Tracker");
-    sf::View view = window.getDefaultView();
+    // sf::View view = window.getDefaultView();
 
     sf::Font notoSans;
     if (!notoSans.loadFromFile("/home/jeremy/dev/gitted/CBT/NotoSans-Bold.ttf")) {
@@ -172,21 +158,19 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
     // buttons.push_back(&pog);
     // buttons.push_back(&pog2);
 
-    #define TEXT_SPACING 50
+#define TEXT_SPACING 50
     vector<sf::Text> itemDrawObjects;
 
     // Created Buy table for what buttons are associated to what item and user
-    ButtonLink* buyTable = new ButtonLink[items.size()];
+    vector<ButtonLink> buyTable;
 
-
-    for (int i = 0; i < items.size(); i++) {
+    for (size_t i = 0; i < items.size(); i++) {
         // Create Text Object
         sf::Text itemText;
         itemText.setFont(notoSans);
         itemText.setString(items[i]->getName());
         itemText.setPosition(20, TEXT_SPACING * i + TEXT_SPACING + 20);
         itemDrawObjects.push_back(itemText);
-
 
         // Create Button Object
         for (size_t j = 0; j < users.size(); j++) {
@@ -196,8 +180,8 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
             ButtonLink link;
             link.item = items[i];
             link.user = users[j];
-            
-            buyTable[buttons.size()] = link;
+
+            buyTable.push_back(link);
             buttons.push_back(userButton);
         }
     }
@@ -218,5 +202,5 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         window.display();
         sf::sleep(sf::milliseconds(50));
     }
-    delete[] buyTable;
+    // delete[] buyTable;
 }

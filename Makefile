@@ -5,7 +5,7 @@ INCLUDE_DIR := ./include
 
 TARGET := CBT
 LIBS := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network
-CFLAGS :=  -I $(INCLUDE_DIR) -c -g
+CFLAGS :=  -I $(INCLUDE_DIR) -c -g -Wall -Wextra -Werror
 
 
 CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)

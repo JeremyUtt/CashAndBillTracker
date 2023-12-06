@@ -1,5 +1,7 @@
 #include "Item.h"
 
+#include <iostream>
+
 Item::Item() {
 }
 
@@ -58,10 +60,10 @@ void Item::removeUser(User* user) {
             break;
         }
     }
-    
+
     // If user found, remove them.
     if (index != -1) {
-        users_.erase(users_.begin()+index);
+        users_.erase(users_.begin() + index);
     }
 }
 
