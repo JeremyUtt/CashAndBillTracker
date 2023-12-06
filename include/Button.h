@@ -8,14 +8,15 @@ typedef std::function<void()> buttonFunction;
 
 class Button {
 private:
-    int xPos;
-    int yPos;
-    int width;
-    int height;
-    bool active;
-    bool hasText;
-    bool hovered;
-    sf::Text text;
+    int xPos_;
+    int yPos_;
+    int width_;
+    int height_;
+    bool active_;
+    bool hasText_;
+    bool hovered_;
+    sf::Text text_;
+    sf::Color color_;
     buttonFunction func;
 
 public:
@@ -24,6 +25,7 @@ public:
     void render(sf::RenderWindow& window);
     void setActiveStatus(bool status);
     void setText(std::string text, sf::Font& font, int fontSize);
+    void setColor(sf::Color color);
     void callFunc();
 };
 

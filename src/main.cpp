@@ -8,7 +8,7 @@
 #include "User.h"
 using namespace std;
 
-void renderWindow();
+void renderWindow(vector<User*>& users, vector<Item*>& items);
 void handleEvents(sf::RenderWindow& window, vector<Button*> buttons);
 
 void testing() {
@@ -78,7 +78,7 @@ int main() {
         cout << users[i]->getName() << ": " << users[i]->getTotal() << endl;
     }
 
-    renderWindow();
+    renderWindow(users, items);
     return 0;
 }
 
@@ -122,14 +122,14 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons) {
     }
 }
 
-void renderWindow() {
+void renderWindow(vector<User*>& users, vector<Item*>& items) {
     vector<Button*> buttons;
 
     sf::RenderWindow window(sf::VideoMode(1280, 720, 32), "Cost and Bill Tracker");
     sf::View view = window.getDefaultView();
 
     sf::Font notoSans;
-    if (!notoSans.loadFromFile("./NotoSans-Bold.ttf")) {
+    if (!notoSans.loadFromFile("/home/jeremy/dev/gitted/CBT/NotoSans-Bold.ttf")) {
         exit(-1);
     }
 
@@ -139,20 +139,46 @@ void renderWindow() {
     titleScreenText.setFillColor(sf::Color::White);
     titleScreenText.setCharacterSize(30);
     titleScreenText.setPosition(20, 20);
-    Button pog(50, 70, 200, 100, testing);
+    // Button pog(50, 70, 200, 100, testing);
 
-    Button pog2(300, 0, 100, 500, testing);
-    pog.setText("Pog", notoSans, 20);
-    pog2.setText("Pog2", notoSans, 20);
-    buttons.push_back(&pog);
-    buttons.push_back(&pog2);
+    // Button pog2(300, 0, 100, 500, testing);
+    // pog.setText("Pog", notoSans, 20);
+    // pog2.setText("Pog2", notoSans, 20);
+    // buttons.push_back(&pog);
+    // buttons.push_back(&pog2);
+
+#define TEXT_SPACING 50
+    vector<sf::Text> itemDrawObjects;
+    for (int i = 0; i < items.size(); i++) {
+        // Create Text Object
+        sf::Text itemText;
+        itemText.setFont(notoSans);
+        itemText.setString(items[i]->getName());
+        itemText.setPosition(20, TEXT_SPACING * i + TEXT_SPACING + 20);
+        itemDrawObjects.push_back(itemText);
+
+        // Create Button Object
+        for (size_t j = 0; j < users.size(); j++) {
+            Button* userButton = new Button(200+150*j, TEXT_SPACING * i + TEXT_SPACING + 20, 120, 50, testing);
+            userButton->setText(users[j]->getName(), notoSans, 25);
+            buttons.push_back(userButton);
+        }
+    }
 
     while (window.isOpen()) {
         handleEvents(window, buttons);
         window.clear(sf::Color(0x181a1b00));
         window.draw(titleScreenText);
-        pog.render(window);
-        pog2.render(window);
+
+        for (size_t i = 0; i < buttons.size(); i++) {
+            buttons[i]->render(window);
+        }
+
+        for (size_t i = 0; i < itemDrawObjects.size(); i++) {
+            window.draw(itemDrawObjects[i]);
+        }
+
         window.display();
+        sf::sleep(sf::milliseconds(50));
     }
 }

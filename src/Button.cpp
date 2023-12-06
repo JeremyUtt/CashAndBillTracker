@@ -3,38 +3,38 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 Button::Button(int x, int y, int width, int height, const buttonFunction& func){
-    this->xPos = x;
-    this->yPos = y;
-    this->width = width;
-    this->height = height;
-    this->active = true;
-    this->hasText = false;
-    this->hovered = false;
+    this->xPos_ = x;
+    this->yPos_ = y;
+    this->width_ = width;
+    this->height_ = height;
+    this->active_ = true;
+    this->hasText_ = false;
+    this->hovered_ = false;
     this->func = func;
 }
 
 bool Button::updateHoverStatus(int mouseX, int mouseY) {
-    if (!active) {
-        this->hovered = false;
+    if (!active_) {
+        this->hovered_ = false;
         return false;
     }
-    if (mouseX > xPos && mouseX < xPos + width) {
-        if (mouseY > yPos && mouseY < yPos + height) {
-            this->hovered = true;
+    if (mouseX > xPos_ && mouseX < xPos_ + width_) {
+        if (mouseY > yPos_ && mouseY < yPos_ + height_) {
+            this->hovered_ = true;
             return true;
         }
     }
-    this->hovered = false;
+    this->hovered_ = false;
     return false;
 }
 
 void Button::render(sf::RenderWindow& window) {
     const int borderWidth = 1;
-    auto drawObject = sf::RectangleShape(sf::Vector2f(width, height));
-    drawObject.setPosition(sf::Vector2f(xPos, yPos));
+    auto drawObject = sf::RectangleShape(sf::Vector2f(width_, height_));
+    drawObject.setPosition(sf::Vector2f(xPos_, yPos_));
     drawObject.setOutlineThickness(borderWidth);
     drawObject.setFillColor(sf::Color(0x2b2b2bff));
-    if (this->hovered) {
+    if (this->hovered_) {
         drawObject.setOutlineColor(sf::Color::Blue);
     } else {
         drawObject.setOutlineColor(sf::Color::White);
@@ -42,19 +42,23 @@ void Button::render(sf::RenderWindow& window) {
 
     window.draw(drawObject);
 
-    if (hasText) {
-        window.draw(this->text);
+    if (hasText_) {
+        window.draw(this->text_);
     }
 }
 
 void Button::setText(std::string string, sf::Font& font, int fontSize) {
-    this->hasText = true;
-    this->text = sf::Text(string, font, fontSize);
-    int textX = xPos + (width / 2) - (this->text.getLocalBounds().width / 2);
-    int textY = yPos + (height / 2) - (this->text.getLocalBounds().height / 2);
-    this->text.setPosition(sf::Vector2f(textX, textY));
+    this->hasText_ = true;
+    this->text_ = sf::Text(string, font, fontSize);
+    int textX = xPos_ + (width_ / 2) - (this->text_.getLocalBounds().width / 2);
+    int textY = yPos_ + (height_ / 2) - (this->text_.getLocalBounds().height / 2);
+    this->text_.setPosition(sf::Vector2f(textX, textY));
 }
 
 void Button::callFunc(){
     func();
+}
+
+void Button::setColor(sf::Color color){
+    this->color_ = color;
 }
