@@ -8,8 +8,8 @@
 #include "User.h"
 using namespace std;
 
-void renderWindow();
-void handleEvents(sf::RenderWindow& window, vector<Button*> buttons);
+void renderWindow(vector<User*>& users, vector<Item*>& items);
+void handleEvents(sf::RenderWindow& window, vector<Button>& buttons);
 
 void testing() {
     cout << "Hello world!" << endl;
@@ -87,19 +87,15 @@ int main() {
     //     cout << items.at(i)->getName() << endl;
     // }
 
-
-    for (size_t i = 0; i < users.size(); i++)
-    {
+    for (size_t i = 0; i < users.size(); i++) {
         cout << users[i]->getName() << ":" << endl;
         vector<Item*> addedItems = users[i]->getAddedItems();
-        for (size_t j = 0; j < addedItems.size(); j++)
-        {
+        for (size_t j = 0; j < addedItems.size(); j++) {
             cout << "   " << addedItems[j]->getName() << endl;
         }
     }
-    
 
-    renderWindow();
+    renderWindow(users, items);
     return 0;
 }
 
@@ -143,7 +139,7 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons) {
     }
 }
 
-void renderWindow() {
+void renderWindow(vector<User*>& users, vector<Item*>& items) {
     vector<Button*> buttons;
 
     sf::RenderWindow window(sf::VideoMode(1280, 720, 32), "Cost and Bill Tracker");
@@ -168,12 +164,37 @@ void renderWindow() {
     buttons.push_back(&pog);
     buttons.push_back(&pog2);
 
+
+    #define TEXT_SPACING 50
+    vector<sf::Text> itemDrawObjects;
+    for (int i = 0; i < items.size(); i++)
+    {
+        // Create Text Object
+        sf::Text itemText;
+        itemText.setFont(notoSans);
+        itemText.setString(items[i]->getName());
+        itemText.setPosition(20, TEXT_SPACING*i+TEXT_SPACING+20);
+        itemDrawObjects.push_back(itemText);
+
+        // Create Button Object
+        
+    }
+    
+
+
     while (window.isOpen()) {
         handleEvents(window, buttons);
         window.clear(sf::Color(0x181a1b00));
         window.draw(titleScreenText);
         pog.render(window);
         pog2.render(window);
+        for (size_t i = 0; i < itemDrawObjects.size(); i++)
+        {
+            window.draw(itemDrawObjects[i]);
+        }
+        
+        
+        
         window.display();
     }
 }
