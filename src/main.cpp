@@ -6,13 +6,34 @@
 #include "Button.h"
 #include "Item.h"
 #include "User.h"
+#include "UserButton.h"
 using namespace std;
 
 void renderWindow(vector<User*>& users, vector<Item*>& items);
-void handleEvents(sf::RenderWindow& window, vector<Button*> buttons);
+void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, ButtonLink buyTable);
 
 void testing() {
     cout << "Hello world!" << endl;
+}
+
+void toggleButton(Button* button, ButtonLink link) {
+    cout << "Hello world! cbtcbrtcbtbf" << endl;
+
+    auto color1 = sf::Color(0x227335ff);
+    auto color2 = sf::Color(0xa60d2cff);
+    if (button->getColor() == color1) {
+        button->setColor(color2);
+        if(link.item != nullptr && link.user != nullptr){
+            link.item->removeUser(link.user);
+        }
+    } else {
+        button->setColor(color1);
+        if(link.item != nullptr && link.user != nullptr){
+            link.item->addUser(link.user);
+        }
+    }
+
+
 }
 
 int main() {
@@ -82,7 +103,7 @@ int main() {
     return 0;
 }
 
-void handleEvents(sf::RenderWindow& window, vector<Button*> buttons) {
+void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, ButtonLink* buyTable) {
     sf::Event event;
     while (window.pollEvent(event)) {
         sf::FloatRect visibleArea;
@@ -95,7 +116,8 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons) {
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     for (size_t i = 0; i < buttons.size(); i++) {
                         if (buttons.at(i)->updateHoverStatus(event.mouseButton.x, event.mouseButton.y)) {
-                            buttons.at(i)->callFunc();
+                            buttons.at(i)->callFunc(buyTable[i]);
+            
                         }
                     }
                 }
@@ -122,9 +144,12 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons) {
     }
 }
 
+
+
+
 void renderWindow(vector<User*>& users, vector<Item*>& items) {
     vector<Button*> buttons;
-
+    
     sf::RenderWindow window(sf::VideoMode(1280, 720, 32), "Cost and Bill Tracker");
     sf::View view = window.getDefaultView();
 
@@ -147,8 +172,13 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
     // buttons.push_back(&pog);
     // buttons.push_back(&pog2);
 
-#define TEXT_SPACING 50
+    #define TEXT_SPACING 50
     vector<sf::Text> itemDrawObjects;
+
+    // Created Buy table for what buttons are associated to what item and user
+    ButtonLink* buyTable = new ButtonLink[items.size()];
+
+
     for (int i = 0; i < items.size(); i++) {
         // Create Text Object
         sf::Text itemText;
@@ -157,16 +187,23 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         itemText.setPosition(20, TEXT_SPACING * i + TEXT_SPACING + 20);
         itemDrawObjects.push_back(itemText);
 
+
         // Create Button Object
         for (size_t j = 0; j < users.size(); j++) {
-            Button* userButton = new Button(200+150*j, TEXT_SPACING * i + TEXT_SPACING + 20, 120, 50, testing);
+            Button* userButton = new Button(200 + 150 * j, TEXT_SPACING * i + TEXT_SPACING + 20, 120, 50, toggleButton);
             userButton->setText(users[j]->getName(), notoSans, 25);
+            userButton->setColor(sf::Color(0xa60d2cff));
+            ButtonLink link;
+            link.item = items[i];
+            link.user = users[j];
+            
+            buyTable[buttons.size()] = link;
             buttons.push_back(userButton);
         }
     }
 
     while (window.isOpen()) {
-        handleEvents(window, buttons);
+        handleEvents(window, buttons, buyTable);
         window.clear(sf::Color(0x181a1b00));
         window.draw(titleScreenText);
 
@@ -181,4 +218,5 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         window.display();
         sf::sleep(sf::milliseconds(50));
     }
+    delete[] buyTable;
 }

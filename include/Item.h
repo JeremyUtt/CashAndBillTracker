@@ -24,7 +24,8 @@ public:
     int getQuantity();
     float getTotalPrice();  
     
-    void addUser(User* User);
+    void addUser(User* user);
+    void removeUser(User* user);
     std::vector<User*> getAddedUsers();
     double pricePerPerson();
 };

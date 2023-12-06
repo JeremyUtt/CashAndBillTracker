@@ -7,7 +7,6 @@ Item::Item(std::string name, float pricePerQuantity, int quantity) {
     this->name = name;
     this->pricePerQuantity = pricePerQuantity;
     this->quantity = quantity;
-    
 }
 
 void Item::setBarcode(int barcode) {
@@ -50,10 +49,26 @@ void Item::addUser(User* user) {
     users_.push_back(user);
 }
 
-std::vector<User*> Item::getAddedUsers(){
+void Item::removeUser(User* user) {
+    // Search for user to remove
+    int index = -1;
+    for (size_t i = 0; i < users_.size(); i++) {
+        if (users_[i] == user) {
+            index = i;
+            break;
+        }
+    }
+    
+    // If user found, remove them.
+    if (index != -1) {
+        users_.erase(users_.begin()+index);
+    }
+}
+
+std::vector<User*> Item::getAddedUsers() {
     return users_;
 }
 
-double Item::pricePerPerson(){
+double Item::pricePerPerson() {
     return getTotalPrice() / users_.size();
 }

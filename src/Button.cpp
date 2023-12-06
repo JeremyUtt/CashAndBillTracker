@@ -2,7 +2,18 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
-Button::Button(int x, int y, int width, int height, const buttonFunction& func){
+// Button::Button(int x, int y, int width, int height, const buttonFunction& func){
+//     this->xPos_ = x;
+//     this->yPos_ = y;
+//     this->width_ = width;
+//     this->height_ = height;
+//     this->active_ = true;
+//     this->hasText_ = false;
+//     this->hovered_ = false;
+//     this->func = func;
+// }
+
+Button::Button(int x, int y, int width, int height, const std::function<void(Button*, ButtonLink&)> func){
     this->xPos_ = x;
     this->yPos_ = y;
     this->width_ = width;
@@ -29,11 +40,11 @@ bool Button::updateHoverStatus(int mouseX, int mouseY) {
 }
 
 void Button::render(sf::RenderWindow& window) {
-    const int borderWidth = 1;
+    const int borderWidth = 3;
     auto drawObject = sf::RectangleShape(sf::Vector2f(width_, height_));
     drawObject.setPosition(sf::Vector2f(xPos_, yPos_));
     drawObject.setOutlineThickness(borderWidth);
-    drawObject.setFillColor(sf::Color(0x2b2b2bff));
+    drawObject.setFillColor(color_);
     if (this->hovered_) {
         drawObject.setOutlineColor(sf::Color::Blue);
     } else {
@@ -55,8 +66,12 @@ void Button::setText(std::string string, sf::Font& font, int fontSize) {
     this->text_.setPosition(sf::Vector2f(textX, textY));
 }
 
-void Button::callFunc(){
-    func();
+void Button::callFunc(ButtonLink& link){
+    func(this, link);
+}
+
+sf::Color Button::getColor(){
+    return color_;
 }
 
 void Button::setColor(sf::Color color){

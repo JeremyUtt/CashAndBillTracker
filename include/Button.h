@@ -3,10 +3,17 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <functional>
-
-typedef std::function<void()> buttonFunction;
+#include "Item.h"
+#include "User.h"
+// typedef std::function<void()> buttonFunction;
+struct ButtonLink
+{
+    Item* item;
+    User* user;
+};
 
 class Button {
+
 private:
     int xPos_;
     int yPos_;
@@ -17,16 +24,17 @@ private:
     bool hovered_;
     sf::Text text_;
     sf::Color color_;
-    buttonFunction func;
+    std::function<void(Button*, ButtonLink&)> func;
 
 public:
-    Button(int x, int y, int width, int height, const buttonFunction& func);
+    // Button(int x, int y, int width, int height, const buttonFunction& func);
+    Button(int x, int y, int width, int height, const std::function<void(Button*, ButtonLink&)> func1);
     bool updateHoverStatus(int mouseX, int mouseY);
     void render(sf::RenderWindow& window);
     void setActiveStatus(bool status);
     void setText(std::string text, sf::Font& font, int fontSize);
+    sf::Color getColor();
     void setColor(sf::Color color);
-    void callFunc();
+    void callFunc(ButtonLink& link);
 };
-
 #endif
