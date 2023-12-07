@@ -1,33 +1,11 @@
-#include <SFML/Graphics.hpp>
-#include <iostream>
-#include <string>
-#include <vector>
+#include "main.h"
 
-#include "Button.h"
-#include "Item.h"
-#include "User.h"
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+
 #include "layout.h"
 using namespace std;
-
-void renderWindow(vector<User*>& users, vector<Item*>& items);
-void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<ButtonLink> buyTable);
-
-void userToggleButton(Button* button, ButtonLink& link) {
-    auto color1 = sf::Color(BUTTON_COLOR_OFF);
-    auto color2 = sf::Color(BUTTON_COLOR_ON);
-
-    // auto color1 = sf::Color(0x227335ff);
-    // auto color2 = sf::Color(0xa60d2cff);
-
-    if (button->getColor() == color1) {
-        button->setColor(color2);
-        link.item->removeUser(link.user);
-
-    } else {
-        button->setColor(color1);
-        link.item->addUser(link.user);
-    }
-}
 
 int main() {
     vector<Item*> items;
@@ -69,26 +47,6 @@ int main() {
 
         Item* item = new Item(input, price, quantity);
         items.push_back(item);
-
-        for (size_t i = 0; i < users.size(); i++) {
-            cout << "is User " << users[i]->getName() << " Buying this: ";
-            cin >> input;
-            if (input == "y" || input == "Y") {
-                // item->addUser(users[i]);
-            }
-        }
-    }
-
-    for (size_t i = 0; i < items.size(); i++) {
-        auto addedUsers = items[i]->getAddedUsers();
-        auto price = items[i]->pricePerPerson();
-        for (size_t j = 0; j < addedUsers.size(); j++) {
-            addedUsers[j]->setTotal(addedUsers[j]->getTotal() + price);
-        }
-    }
-
-    for (size_t i = 0; i < users.size(); i++) {
-        cout << users[i]->getName() << ": " << users[i]->getTotal() << endl;
     }
 
     renderWindow(users, items);
@@ -113,7 +71,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
     titleScreenText.setString("Cost and Bill Tracker");
     titleScreenText.setFillColor(sf::Color::White);
     titleScreenText.setCharacterSize(30);
-    titleScreenText.setPosition(20, 20);
+    titleScreenText.setPosition(LEFT_OFFSET, TOP_OFFSET);
 
     // Created Buy table for what buttons are associated to what item and user
     // only the toggle buttons for adding items to a users cart should be added to this table
@@ -121,24 +79,45 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
 
     // Interface for all items to buy
     vector<sf::Text> itemDrawObjects;
+    vector<sf::Text> itemUpdateObjects;
+    vector<sf::Text> UserTotalUpdateObjects;
 
-    // For each item
+    const vector<string> tags = {"Name:", "Total:", "Users: (Select All)", "Price Per Person:"};
+    const vector<int> xPositions = {NAME_START_X, TOTAL_START_X, BUTTON_START_X, BUTTON_START_X + ITEM_X_SPACING + (int)users.size() * (ITEM_X_SPACING + BUTTON_WIDTH)};
+    for (size_t i = 0; i < 4; i++) {
+        sf::Text tagText;
+        tagText.setFont(notoSans);
+        tagText.setString(tags[i]);
+        tagText.setPosition(xPositions[i], TOP_OFFSET + ITEM_Y_SPACING);
+        tagText.setCharacterSize(FONT_SIZE);
+        itemDrawObjects.push_back(tagText);
+    }
+
     for (size_t i = 0; i < items.size(); i++) {
-        // Create Text Object
-        sf::Text itemText;
-        itemText.setFont(notoSans);
-        itemText.setString(items[i]->getName());
-        itemText.setPosition(LEFT_OFFSET, ITEM_Y_SPACING * i + ITEM_Y_SPACING + TOP_OFFSET);
-        itemDrawObjects.push_back(itemText);
+        // Create Name Object
+        sf::Text nameText;
+        nameText.setFont(notoSans);
+        nameText.setString(items[i]->getName());
+        nameText.setPosition(NAME_START_X, ITEM_Y_SPACING * (i + 1) + NAME_START_Y);
+        nameText.setCharacterSize(FONT_SIZE);
+        itemDrawObjects.push_back(nameText);
 
-        // Create Button Object
+        // Create Total
+        sf::Text totalText;
+        totalText.setFont(notoSans);
+        totalText.setString(fltToStr(items[i]->getTotalPrice()));
+        totalText.setPosition(TOTAL_START_X, ITEM_Y_SPACING * (i + 1) + NAME_START_Y);
+        totalText.setCharacterSize(FONT_SIZE);
+        itemDrawObjects.push_back(totalText);
+
+        // Create Button Objects
         for (size_t j = 0; j < users.size(); j++) {
-            Button* userButton = new Button(BUTTON_START_X + BUTTON_X_SPACING * j,
-                                            ITEM_Y_SPACING * i + ITEM_Y_SPACING + TOP_OFFSET,
+            Button* userButton = new Button(BUTTON_START_X + (ITEM_X_SPACING + BUTTON_WIDTH) * j,
+                                            ITEM_Y_SPACING * (i + 1) + NAME_START_Y,
                                             BUTTON_WIDTH,
                                             BUTTON_HEIGHT,
                                             userToggleButton);
-            userButton->setText(users[j]->getName(), notoSans, 25);
+            userButton->setText(users[j]->getName(), notoSans, FONT_SIZE);
             userButton->setColor(sf::Color(BUTTON_COLOR_OFF));
             ButtonLink link;
             link.item = items[i];
@@ -147,6 +126,29 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
             buyTable.push_back(link);
             buttons.push_back(userButton);
         }
+
+        // Create Price Per Person Object
+        sf::Text pppText;
+        pppText.setFont(notoSans);
+        pppText.setPosition((BUTTON_WIDTH + ITEM_X_SPACING) * users.size() + ITEM_X_SPACING + BUTTON_START_X, ITEM_Y_SPACING * (i + 1) + NAME_START_Y);
+        pppText.setCharacterSize(FONT_SIZE);
+        itemUpdateObjects.push_back(pppText);
+    }
+
+    for (size_t i = 0; i < users.size(); i++) {
+        sf::Text peopleNames;
+        peopleNames.setFont(notoSans);
+        peopleNames.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), USER_TOTAL_Y);
+        peopleNames.setCharacterSize(FONT_SIZE);
+        peopleNames.setString(users[i]->getName());
+        itemDrawObjects.push_back(peopleNames);
+        
+        
+        sf::Text peopleTotals;
+        peopleTotals.setFont(notoSans);
+        peopleTotals.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), USER_TOTAL_Y+USER_SPACING_Y);
+        peopleTotals.setCharacterSize(FONT_SIZE);
+        UserTotalUpdateObjects.push_back(peopleTotals);
     }
 
     while (window.isOpen()) {
@@ -162,6 +164,22 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         // Draw All Buttons
         for (size_t i = 0; i < buttons.size(); i++) {
             buttons[i]->render(window);
+        }
+
+        for (size_t i = 0; i < itemUpdateObjects.size(); i++) {
+            string text = fltToStr(items[i]->pricePerPerson());
+            if (text == "inf") {
+                text = "Select one or more";
+            }
+
+            itemUpdateObjects[i].setString(text);
+            window.draw(itemUpdateObjects[i]);
+        }
+
+        for (size_t i = 0; i < UserTotalUpdateObjects.size(); i++) {
+            string text = fltToStr(users[i]->getTotal());
+            UserTotalUpdateObjects[i].setString(text);
+            window.draw(UserTotalUpdateObjects[i]);
         }
 
         window.display();
@@ -208,4 +226,24 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<Butt
                 break;
         }
     }
+}
+
+void userToggleButton(Button* button, ButtonLink& link) {
+    auto color1 = sf::Color(BUTTON_COLOR_OFF);
+    auto color2 = sf::Color(BUTTON_COLOR_ON);
+
+    if (button->getColor() == color1) {
+        button->setColor(color2);
+        link.item->addUser(link.user);
+
+    } else {
+        button->setColor(color1);
+        link.item->removeUser(link.user);
+    }
+}
+
+string fltToStr(float num) {
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(2) << num;
+    return stream.str();
 }

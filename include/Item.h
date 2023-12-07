@@ -12,7 +12,6 @@ private:
     int quantity;
     std::vector<User*> users_;
 public:
-    Item();
     Item(std::string name, float pricePerQuantity, int quantity);
     void setBarcode(int barcode);
     int getBarcode();

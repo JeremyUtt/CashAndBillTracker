@@ -2,9 +2,6 @@
 
 #include <iostream>
 
-Item::Item() {
-}
-
 Item::Item(std::string name, float pricePerQuantity, int quantity) {
     this->name = name;
     this->pricePerQuantity = pricePerQuantity;
