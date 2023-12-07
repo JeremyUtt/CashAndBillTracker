@@ -224,7 +224,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         // List Everyones names
         sf::Text peopleNames;
         peopleNames.setFont(notoSans);
-        peopleNames.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), USER_TOTAL_Y);
+        peopleNames.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), ITEM_Y_SPACING * (items.size() + 2) + NAME_START_Y);
         peopleNames.setCharacterSize(FONT_SIZE);
         peopleNames.setString(users[i]->getName());
         itemDrawObjects.push_back(peopleNames);
@@ -232,7 +232,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         // Below each name, print their total price
         sf::Text peopleTotals;
         peopleTotals.setFont(notoSans);
-        peopleTotals.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), USER_TOTAL_Y + USER_SPACING_Y);
+        peopleTotals.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), ITEM_Y_SPACING * (items.size() + 2) + NAME_START_Y + USER_SPACING_Y);
         peopleTotals.setCharacterSize(FONT_SIZE);
         UserTotalUpdateObjects.push_back(peopleTotals);
     }

@@ -43,8 +43,7 @@
 
 // ======= Per User Totals =======
 
-#define USER_TOTAL_X 200
-#define USER_TOTAL_Y 400
+#define USER_TOTAL_X 20
 
 // start to start spacing
 #define USER_SPACING_X 100

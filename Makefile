@@ -1,6 +1,6 @@
 SRC_DIR 	:= ./src
 BUILD_DIR 	:= ./build
-BIN_DIR		:= ./bin
+BIN_DIR		:= ./
 INCLUDE_DIR := ./include
 
 TARGET := CBT
