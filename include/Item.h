@@ -9,10 +9,13 @@ private:
     int barcode;
     std::string name;
     float pricePerQuantity;
-    int quantity;
-    std::vector<User*> users_;
+    int _quantity;
+    std::vector<User*> _users;
 public:
+    // Construstor
     Item(std::string name, float pricePerQuantity, int quantity);
+    
+    // Getters/Setters
     void setBarcode(int barcode);
     int getBarcode();
     void setName(std::string name);
@@ -21,12 +24,15 @@ public:
     float getPricePerQuantity();
     void setQuantity(int quantity);
     int getQuantity();
-    float getTotalPrice();  
     
+    // "Complex" methods
+    float getTotalPrice();  
     void addUser(User* user);
     void removeUser(User* user);
     std::vector<User*> getAddedUsers();
     double pricePerPerson();
+    // void updateUserTotals();
+
 };
 
 

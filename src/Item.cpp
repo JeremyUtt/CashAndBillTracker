@@ -5,7 +5,7 @@
 Item::Item(std::string name, float pricePerQuantity, int quantity) {
     this->name = name;
     this->pricePerQuantity = pricePerQuantity;
-    this->quantity = quantity;
+    this->_quantity = quantity;
 }
 
 void Item::setBarcode(int barcode) {
@@ -33,26 +33,26 @@ float Item::getPricePerQuantity() {
 }
 
 void Item::setQuantity(int quantity) {
-    this->quantity = quantity;
+    this->_quantity = quantity;
 }
 
 int Item::getQuantity() {
-    return quantity;
+    return _quantity;
 }
 
 float Item::getTotalPrice() {
-    return pricePerQuantity * quantity;
+    return pricePerQuantity * _quantity;
 }
 
 void Item::addUser(User* user) {
-    users_.push_back(user);
+    _users.push_back(user);
 }
 
 void Item::removeUser(User* user) {
     // Search for user to remove
     int index = -1;
-    for (size_t i = 0; i < users_.size(); i++) {
-        if (users_[i] == user) {
+    for (size_t i = 0; i < _users.size(); i++) {
+        if (_users[i] == user) {
             index = i;
             break;
         }
@@ -60,14 +60,30 @@ void Item::removeUser(User* user) {
 
     // If user found, remove them.
     if (index != -1) {
-        users_.erase(users_.begin() + index);
+        _users.erase(_users.begin() + index);
     }
 }
 
 std::vector<User*> Item::getAddedUsers() {
-    return users_;
+    return _users;
 }
 
 double Item::pricePerPerson() {
-    return getTotalPrice() / users_.size();
+    return getTotalPrice() / _users.size();
 }
+
+// void Item::updateUserTotals() {
+//     for (size_t i = 0; i < items.size(); i++) {
+//         auto addedUsers = items[i]->getAddedUsers();
+//         auto price = items[i]->pricePerPerson();
+//         // For each participating user, add the items pricePerPerson() to their total
+//         for (size_t j = 0; j < addedUsers.size(); j++) {
+//             addedUsers[j]->setTotal(addedUsers[j]->getTotal() + price);
+//         }
+//     }
+
+//     // Debugging/Redundant Print Statement
+//     for (size_t i = 0; i < users.size(); i++) {
+//         cout << users[i]->getName() << ": " << users[i]->getTotal() << endl;
+//     }
+// }

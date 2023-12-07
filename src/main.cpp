@@ -3,7 +3,8 @@
 // https://favtutor.com/blogs/split-string-cpp
 // https://stackoverflow.com/questions/10376199/how-can-i-use-non-default-delimiters-when-reading-a-text-file-with-stdfstream
 // https://www.sfml-dev.org/documentation/2.6.1/
-
+// https://www.geeksforgeeks.org/convert-float-to-string-in-cpp/
+// https://stackoverflow.com/questions/41959721/passing-function-to-class-in-c
 
 #include "main.h"
 
@@ -19,24 +20,28 @@ int main() {
     vector<Item*> items;
     vector<User*> users;
 
+    // Ask user for type of data input
     while (true) {
         cout << "How would you like in input the data?" << endl;
         cout << "1. A CSV File, 2. Manually (1,2):";
         int choice;
         cin >> choice;
+        // Check id wrong datatype entered (or other failure)
         if (cin.fail()) {
             cin.clear();
-            cout << "Invadid choice" << endl;
+            cout << "Invalid choice" << endl;
             continue;
         }
         if (choice == 1) {
+            // function will modify the users and items vector
             readCSV(users, items);
             break;
         } else if (choice == 2) {
+            // function will modify the users and items vector
             readManual(users, items);
             break;
         } else {
-            cout << "Invadid choice" << endl;
+            cout << "Invalid choice" << endl;
         }
     }
     renderWindow(users, items);
@@ -44,36 +49,39 @@ int main() {
 }
 
 void readCSV(vector<User*>& users, vector<Item*>& items) {
-    cout << users.size() << items.size();
-
+    // Prompt user for file name
     cout << "Enter Filename:";
     string fileName;
     cin >> fileName;
+
     ifstream file(fileName);
 
+    // Read user names from the first line of the file
+    // https://favtutor.com/blogs/split-string-cpp
     string names;
     getline(file, names, '\n');
-    // https://favtutor.com/blogs/split-string-cpp
     stringstream nameStream(names);
 
+    // Create User objects based on the names
+    // https://stackoverflow.com/questions/10376199/how-can-i-use-non-default-delimiters-when-reading-a-text-file-with-stdfstream
     string uName;
     bool getBuyer = true;
-    // https://stackoverflow.com/questions/10376199/how-can-i-use-non-default-delimiters-when-reading-a-text-file-with-stdfstream
     while (getline(nameStream, uName, ',')) {
         User* buyer = new User(uName, getBuyer);
         getBuyer = false;
         users.push_back(buyer);
     }
 
+    // Read item details from the remaining lines of the file
     string iName, price, quantity;
     while (getline(file, iName, ',')) {
         cout << iName << endl;
         getline(file, price, ',');
         cout << price << endl;
-        
+
         getline(file, quantity, '\n');
         cout << quantity << endl;
-        
+
         // https://www.programiz.com/cpp-programming/string-float-conversion
         Item* item = new Item(iName, stof(price), stoi(quantity));
         items.push_back(item);
@@ -85,8 +93,11 @@ void readManual(vector<User*>& users, vector<Item*>& items) {
     cout << "Enter name of person Buying: ";
     string name;
     cin >> name;
+
     User* buyer = new User(name, true);
     users.push_back(buyer);
+
+    // Input other users' names until 'q' is entered
     while (true) {
         cout << "Enter next users name: (or q to quit)";
         cin >> name;
@@ -98,6 +109,7 @@ void readManual(vector<User*>& users, vector<Item*>& items) {
         users.push_back(user);
     }
 
+    // Input item details until q is entered
     while (true) {
         cout << "Enter Name of Product (or q to quit):";
         string input;
@@ -152,7 +164,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
     vector<sf::Text> itemUpdateObjects;
     vector<sf::Text> UserTotalUpdateObjects;
 
-    
+    // Add header for graphical table
     const vector<string> tags = {"Name:", "Total:", "Users: (Select All)", "Price Per Person:"};
     const vector<int> xPositions = {NAME_START_X, TOTAL_START_X, BUTTON_START_X, BUTTON_START_X + ITEM_X_SPACING + (int)users.size() * (ITEM_X_SPACING + BUTTON_WIDTH)};
     for (size_t i = 0; i < 4; i++) {
@@ -164,8 +176,9 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         itemDrawObjects.push_back(tagText);
     }
 
+    // Repeat for every item in the list
     for (size_t i = 0; i < items.size(); i++) {
-        // Create Name Object
+        // Create Name coloum
         sf::Text nameText;
         nameText.setFont(notoSans);
         nameText.setString(items[i]->getName());
@@ -173,7 +186,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         nameText.setCharacterSize(FONT_SIZE);
         itemDrawObjects.push_back(nameText);
 
-        // Create Total
+        // Create Total (2nd) coloum
         sf::Text totalText;
         totalText.setFont(notoSans);
         totalText.setString(fltToStr(items[i]->getTotalPrice()));
@@ -198,7 +211,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
             buttons.push_back(userButton);
         }
 
-        // Create Price Per Person Object
+        // Create Price Per Person (last) coloum
         sf::Text pppText;
         pppText.setFont(notoSans);
         pppText.setPosition((BUTTON_WIDTH + ITEM_X_SPACING) * users.size() + ITEM_X_SPACING + BUTTON_START_X, ITEM_Y_SPACING * (i + 1) + NAME_START_Y);
@@ -206,7 +219,9 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         itemUpdateObjects.push_back(pppText);
     }
 
+    // Create section that will contain each users total cost
     for (size_t i = 0; i < users.size(); i++) {
+        // List Everyones names
         sf::Text peopleNames;
         peopleNames.setFont(notoSans);
         peopleNames.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), USER_TOTAL_Y);
@@ -214,6 +229,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         peopleNames.setString(users[i]->getName());
         itemDrawObjects.push_back(peopleNames);
 
+        // Below each name, print their total price
         sf::Text peopleTotals;
         peopleTotals.setFont(notoSans);
         peopleTotals.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), USER_TOTAL_Y + USER_SPACING_Y);
@@ -221,6 +237,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         UserTotalUpdateObjects.push_back(peopleTotals);
     }
 
+    // Start main draw loop
     while (window.isOpen()) {
         handleEvents(window, buttons, buyTable, users, items);
         window.clear(sf::Color(BACKGROUND_COLOR));
@@ -236,6 +253,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
             buttons[i]->render(window);
         }
 
+        // Draw some text items that values will update over time
         for (size_t i = 0; i < itemUpdateObjects.size(); i++) {
             string text = fltToStr(items[i]->pricePerPerson());
             if (text == "$inf") {
@@ -246,6 +264,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
             window.draw(itemUpdateObjects[i]);
         }
 
+        // Draw more text items that values will update over time
         for (size_t i = 0; i < UserTotalUpdateObjects.size(); i++) {
             string text = fltToStr(users[i]->getTotal());
             UserTotalUpdateObjects[i].setString(text);
@@ -255,7 +274,6 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         window.display();
         sf::sleep(sf::milliseconds(50));
     }
-    // delete[] buyTable;
 }
 
 void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<ButtonLink> buyTable, vector<User*>& users, vector<Item*>& items) {
@@ -270,6 +288,7 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<Butt
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     for (size_t i = 0; i < buttons.size(); i++) {
+                        // if button is clicked on, call its assisiated function
                         if (buttons.at(i)->updateHoverStatus(event.mouseButton.x, event.mouseButton.y)) {
                             buttons.at(i)->callFunc(buyTable[i]);
 
@@ -283,11 +302,13 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<Butt
             case sf::Event::MouseMoved:
                 // cout << "Hello world" << endl;
                 for (size_t i = 0; i < buttons.size(); i++) {
+                    // changes border color of buttons when hovered over
                     buttons.at(i)->updateHoverStatus(event.mouseMove.x, event.mouseMove.y);
                 }
                 break;
 
             case sf::Event::Resized:
+                // this prevented the window from streaching contents when resized
                 visibleArea.left = 0;
                 visibleArea.top = 0;
                 visibleArea.width = event.size.width;
@@ -302,11 +323,13 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<Butt
 }
 
 void userToggleButton(Button* button, ButtonLink& link) {
+    // this will be called by individual buttens when clicked
+
+    // define colors for clicked and unclicked
     auto color1 = sf::Color(BUTTON_COLOR_OFF);
     auto color2 = sf::Color(BUTTON_COLOR_ON);
 
-    // auto price = link.item->pricePerPerson();
-
+    // use the color of the button to determine its 'state'
     if (button->getColor() == color1) {
         button->setColor(color2);
         link.item->addUser(link.user);
@@ -316,22 +339,18 @@ void userToggleButton(Button* button, ButtonLink& link) {
         link.item->removeUser(link.user);
         // price *= -1;
     }
-
-    // auto addedUsers = link.item->getAddedUsers();
-    // for (size_t j = 0; j < addedUsers.size(); j++) {
-    //     addedUsers[j]->setTotal(addedUsers[j]->getTotal() + price);
-    // }
-
-    // cout << link.user->getName() << ": " << link.user->getTotal() << endl;
 }
 
 string fltToStr(float num) {
-    std::stringstream stream;
+    // Converts a float to a string
+    // https://www.geeksforgeeks.org/convert-float-to-string-in-cpp/
+    stringstream stream;
     stream << "$" << std::fixed << std::setprecision(2) << num;
     return stream.str();
 }
 
 void updateTotals(vector<User*>& users, vector<Item*>& items) {
+    // recalutates per person totals from scratch
     for (size_t i = 0; i < users.size(); i++) {
         users[i]->setTotal(0);
     }
@@ -339,11 +358,13 @@ void updateTotals(vector<User*>& users, vector<Item*>& items) {
     for (size_t i = 0; i < items.size(); i++) {
         auto addedUsers = items[i]->getAddedUsers();
         auto price = items[i]->pricePerPerson();
+        // For each participating user, add the items pricePerPerson() to their total
         for (size_t j = 0; j < addedUsers.size(); j++) {
             addedUsers[j]->setTotal(addedUsers[j]->getTotal() + price);
         }
     }
 
+    // Debugging/Redundant Print Statement
     for (size_t i = 0; i < users.size(); i++) {
         cout << users[i]->getName() << ": " << users[i]->getTotal() << endl;
     }

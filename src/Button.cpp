@@ -2,16 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
-// Button::Button(int x, int y, int width, int height, const buttonFunction& func){
-//     this->xPos_ = x;
-//     this->yPos_ = y;
-//     this->width_ = width;
-//     this->height_ = height;
-//     this->active_ = true;
-//     this->hasText_ = false;
-//     this->hovered_ = false;
-//     this->func = func;
-// }
 
 Button::Button(int x, int y, int width, int height, const std::function<void(Button*, ButtonLink&)> func) {
     this->xPos_ = x;
@@ -40,11 +30,14 @@ bool Button::updateHoverStatus(int mouseX, int mouseY) {
 }
 
 void Button::render(sf::RenderWindow& window) {
+    // Created a draw object, configures it, and
+    // draws it to the screen
     const int borderWidth = 3;
     auto drawObject = sf::RectangleShape(sf::Vector2f(width_, height_));
     drawObject.setPosition(sf::Vector2f(xPos_, yPos_));
     drawObject.setOutlineThickness(borderWidth);
     drawObject.setFillColor(color_);
+    // change border color depending on if its activaly holvered over
     if (this->hovered_) {
         drawObject.setOutlineColor(sf::Color::Blue);
     } else {
@@ -59,6 +52,7 @@ void Button::render(sf::RenderWindow& window) {
 }
 
 void Button::setText(std::string string, sf::Font& font, int fontSize) {
+    // configures a text element to be drawn inside the button
     this->hasText_ = true;
     this->text_ = sf::Text(string, font, fontSize);
     int textX = xPos_ + (width_ / 2) - (this->text_.getLocalBounds().width / 2);
@@ -67,6 +61,10 @@ void Button::setText(std::string string, sf::Font& font, int fontSize) {
 }
 
 void Button::callFunc(ButtonLink& link) {
+    // calls function that is passed to the class at
+    // object/instance creation time
+
+    // uses ButtonLink& link to have less parameters
     func(this, link);
 }
 
