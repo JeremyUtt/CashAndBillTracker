@@ -142,17 +142,16 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         peopleNames.setCharacterSize(FONT_SIZE);
         peopleNames.setString(users[i]->getName());
         itemDrawObjects.push_back(peopleNames);
-        
-        
+
         sf::Text peopleTotals;
         peopleTotals.setFont(notoSans);
-        peopleTotals.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), USER_TOTAL_Y+USER_SPACING_Y);
+        peopleTotals.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), USER_TOTAL_Y + USER_SPACING_Y);
         peopleTotals.setCharacterSize(FONT_SIZE);
         UserTotalUpdateObjects.push_back(peopleTotals);
     }
 
     while (window.isOpen()) {
-        handleEvents(window, buttons, buyTable);
+        handleEvents(window, buttons, buyTable, users, items);
         window.clear(sf::Color(BACKGROUND_COLOR));
         window.draw(titleScreenText);
 
@@ -188,7 +187,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
     // delete[] buyTable;
 }
 
-void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<ButtonLink> buyTable) {
+void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<ButtonLink> buyTable, vector<User*>& users, vector<Item*>& items) {
     sf::Event event;
     while (window.pollEvent(event)) {
         sf::FloatRect visibleArea;
@@ -202,6 +201,9 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<Butt
                     for (size_t i = 0; i < buttons.size(); i++) {
                         if (buttons.at(i)->updateHoverStatus(event.mouseButton.x, event.mouseButton.y)) {
                             buttons.at(i)->callFunc(buyTable[i]);
+
+                            // Update User Totals
+                            updateTotals(users, items);
                         }
                     }
                 }
@@ -232,6 +234,8 @@ void userToggleButton(Button* button, ButtonLink& link) {
     auto color1 = sf::Color(BUTTON_COLOR_OFF);
     auto color2 = sf::Color(BUTTON_COLOR_ON);
 
+    // auto price = link.item->pricePerPerson();
+
     if (button->getColor() == color1) {
         button->setColor(color2);
         link.item->addUser(link.user);
@@ -239,11 +243,37 @@ void userToggleButton(Button* button, ButtonLink& link) {
     } else {
         button->setColor(color1);
         link.item->removeUser(link.user);
+        // price *= -1;
     }
+
+    // auto addedUsers = link.item->getAddedUsers();
+    // for (size_t j = 0; j < addedUsers.size(); j++) {
+    //     addedUsers[j]->setTotal(addedUsers[j]->getTotal() + price);
+    // }
+
+    // cout << link.user->getName() << ": " << link.user->getTotal() << endl;
 }
 
 string fltToStr(float num) {
     std::stringstream stream;
     stream << std::fixed << std::setprecision(2) << num;
     return stream.str();
+}
+
+void updateTotals(vector<User*>& users, vector<Item*>& items) {
+    for (size_t i = 0; i < users.size(); i++) {
+        users[i]->setTotal(0);
+    }
+
+    for (size_t i = 0; i < items.size(); i++) {
+        auto addedUsers = items[i]->getAddedUsers();
+        auto price = items[i]->pricePerPerson();
+        for (size_t j = 0; j < addedUsers.size(); j++) {
+            addedUsers[j]->setTotal(addedUsers[j]->getTotal() + price);
+        }
+    }
+
+    for (size_t i = 0; i < users.size(); i++) {
+        cout << users[i]->getName() << ": " << users[i]->getTotal() << endl;
+    }
 }
