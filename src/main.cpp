@@ -1,5 +1,13 @@
+
+// https://www.programiz.com/cpp-programming/string-float-conversion
+// https://favtutor.com/blogs/split-string-cpp
+// https://stackoverflow.com/questions/10376199/how-can-i-use-non-default-delimiters-when-reading-a-text-file-with-stdfstream
+// https://www.sfml-dev.org/documentation/2.6.1/
+
+
 #include "main.h"
 
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -11,6 +19,69 @@ int main() {
     vector<Item*> items;
     vector<User*> users;
 
+    while (true) {
+        cout << "How would you like in input the data?" << endl;
+        cout << "1. A CSV File, 2. Manually (1,2):";
+        int choice;
+        cin >> choice;
+        if (cin.fail()) {
+            cin.clear();
+            cout << "Invadid choice" << endl;
+            continue;
+        }
+        if (choice == 1) {
+            readCSV(users, items);
+            break;
+        } else if (choice == 2) {
+            readManual(users, items);
+            break;
+        } else {
+            cout << "Invadid choice" << endl;
+        }
+    }
+    renderWindow(users, items);
+    return 0;
+}
+
+void readCSV(vector<User*>& users, vector<Item*>& items) {
+    cout << users.size() << items.size();
+
+    cout << "Enter Filename:";
+    string fileName;
+    cin >> fileName;
+    ifstream file(fileName);
+
+    string names;
+    getline(file, names, '\n');
+    // https://favtutor.com/blogs/split-string-cpp
+    stringstream nameStream(names);
+
+    string uName;
+    bool getBuyer = true;
+    // https://stackoverflow.com/questions/10376199/how-can-i-use-non-default-delimiters-when-reading-a-text-file-with-stdfstream
+    while (getline(nameStream, uName, ',')) {
+        User* buyer = new User(uName, getBuyer);
+        getBuyer = false;
+        users.push_back(buyer);
+    }
+
+    string iName, price, quantity;
+    while (getline(file, iName, ',')) {
+        cout << iName << endl;
+        getline(file, price, ',');
+        cout << price << endl;
+        
+        getline(file, quantity, '\n');
+        cout << quantity << endl;
+        
+        // https://www.programiz.com/cpp-programming/string-float-conversion
+        Item* item = new Item(iName, stof(price), stoi(quantity));
+        items.push_back(item);
+    }
+    file.close();
+}
+
+void readManual(vector<User*>& users, vector<Item*>& items) {
     cout << "Enter name of person Buying: ";
     string name;
     cin >> name;
@@ -48,15 +119,13 @@ int main() {
         Item* item = new Item(input, price, quantity);
         items.push_back(item);
     }
-
-    renderWindow(users, items);
-    return 0;
 }
 
 void renderWindow(vector<User*>& users, vector<Item*>& items) {
     // Create Buttons array
     vector<Button*> buttons;
 
+    // https://www.sfml-dev.org/documentation/2.6.1/
     sf::RenderWindow window(sf::VideoMode(1280, 720, 32), "Cost and Bill Tracker");
 
     // Load Text Font
@@ -73,15 +142,17 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
     titleScreenText.setCharacterSize(30);
     titleScreenText.setPosition(LEFT_OFFSET, TOP_OFFSET);
 
-    // Created Buy table for what buttons are associated to what item and user
-    // only the toggle buttons for adding items to a users cart should be added to this table
+    // Create Buy table for what buttons are associated to what item and user
+    // only the toggle buttons for adding items to a users cart should be added to this list
     vector<ButtonLink> buyTable;
 
     // Interface for all items to buy
+    // these vectors will be looped over in the draw loop to render
     vector<sf::Text> itemDrawObjects;
     vector<sf::Text> itemUpdateObjects;
     vector<sf::Text> UserTotalUpdateObjects;
 
+    
     const vector<string> tags = {"Name:", "Total:", "Users: (Select All)", "Price Per Person:"};
     const vector<int> xPositions = {NAME_START_X, TOTAL_START_X, BUTTON_START_X, BUTTON_START_X + ITEM_X_SPACING + (int)users.size() * (ITEM_X_SPACING + BUTTON_WIDTH)};
     for (size_t i = 0; i < 4; i++) {
@@ -167,7 +238,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
 
         for (size_t i = 0; i < itemUpdateObjects.size(); i++) {
             string text = fltToStr(items[i]->pricePerPerson());
-            if (text == "inf") {
+            if (text == "$inf") {
                 text = "Select one or more";
             }
 
@@ -256,7 +327,7 @@ void userToggleButton(Button* button, ButtonLink& link) {
 
 string fltToStr(float num) {
     std::stringstream stream;
-    stream << std::fixed << std::setprecision(2) << num;
+    stream << "$" << std::fixed << std::setprecision(2) << num;
     return stream.str();
 }
 
