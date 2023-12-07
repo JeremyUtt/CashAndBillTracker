@@ -6,15 +6,18 @@
 #include "Button.h"
 #include "Item.h"
 #include "User.h"
-#include "UserButton.h"
+#include "layout.h"
 using namespace std;
 
 void renderWindow(vector<User*>& users, vector<Item*>& items);
-void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, ButtonLink buyTable);
+void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<ButtonLink> buyTable);
 
-void toggleButton(Button* button, ButtonLink link) {
-    auto color1 = sf::Color(0x227335ff);
-    auto color2 = sf::Color(0xa60d2cff);
+void userToggleButton(Button* button, ButtonLink& link) {
+    auto color1 = sf::Color(BUTTON_COLOR_OFF);
+    auto color2 = sf::Color(BUTTON_COLOR_ON);
+
+    // auto color1 = sf::Color(0x227335ff);
+    // auto color2 = sf::Color(0xa60d2cff);
 
     if (button->getColor() == color1) {
         button->setColor(color2);
@@ -24,7 +27,6 @@ void toggleButton(Button* button, ButtonLink link) {
         button->setColor(color1);
         link.item->addUser(link.user);
     }
-
 }
 
 int main() {
@@ -93,6 +95,81 @@ int main() {
     return 0;
 }
 
+void renderWindow(vector<User*>& users, vector<Item*>& items) {
+    // Create Buttons array
+    vector<Button*> buttons;
+
+    sf::RenderWindow window(sf::VideoMode(1280, 720, 32), "Cost and Bill Tracker");
+
+    // Load Text Font
+    sf::Font notoSans;
+    if (!notoSans.loadFromFile("/home/jeremy/Dev/CBT/NotoSans-Bold.ttf")) {
+        exit(-1);
+    }
+
+    // Create Title Text
+    sf::Text titleScreenText;
+    titleScreenText.setFont(notoSans);
+    titleScreenText.setString("Cost and Bill Tracker");
+    titleScreenText.setFillColor(sf::Color::White);
+    titleScreenText.setCharacterSize(30);
+    titleScreenText.setPosition(20, 20);
+
+    // Created Buy table for what buttons are associated to what item and user
+    // only the toggle buttons for adding items to a users cart should be added to this table
+    vector<ButtonLink> buyTable;
+
+    // Interface for all items to buy
+    vector<sf::Text> itemDrawObjects;
+
+    // For each item
+    for (size_t i = 0; i < items.size(); i++) {
+        // Create Text Object
+        sf::Text itemText;
+        itemText.setFont(notoSans);
+        itemText.setString(items[i]->getName());
+        itemText.setPosition(LEFT_OFFSET, ITEM_Y_SPACING * i + ITEM_Y_SPACING + TOP_OFFSET);
+        itemDrawObjects.push_back(itemText);
+
+        // Create Button Object
+        for (size_t j = 0; j < users.size(); j++) {
+            Button* userButton = new Button(BUTTON_START_X + BUTTON_X_SPACING * j,
+                                            ITEM_Y_SPACING * i + ITEM_Y_SPACING + TOP_OFFSET,
+                                            BUTTON_WIDTH,
+                                            BUTTON_HEIGHT,
+                                            userToggleButton);
+            userButton->setText(users[j]->getName(), notoSans, 25);
+            userButton->setColor(sf::Color(BUTTON_COLOR_OFF));
+            ButtonLink link;
+            link.item = items[i];
+            link.user = users[j];
+
+            buyTable.push_back(link);
+            buttons.push_back(userButton);
+        }
+    }
+
+    while (window.isOpen()) {
+        handleEvents(window, buttons, buyTable);
+        window.clear(sf::Color(BACKGROUND_COLOR));
+        window.draw(titleScreenText);
+
+        // Draw all Item Names
+        for (size_t i = 0; i < itemDrawObjects.size(); i++) {
+            window.draw(itemDrawObjects[i]);
+        }
+
+        // Draw All Buttons
+        for (size_t i = 0; i < buttons.size(); i++) {
+            buttons[i]->render(window);
+        }
+
+        window.display();
+        sf::sleep(sf::milliseconds(50));
+    }
+    // delete[] buyTable;
+}
+
 void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<ButtonLink> buyTable) {
     sf::Event event;
     while (window.pollEvent(event)) {
@@ -131,76 +208,4 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<Butt
                 break;
         }
     }
-}
-
-void renderWindow(vector<User*>& users, vector<Item*>& items) {
-    vector<Button*> buttons;
-
-    sf::RenderWindow window(sf::VideoMode(1280, 720, 32), "Cost and Bill Tracker");
-    // sf::View view = window.getDefaultView();
-
-    sf::Font notoSans;
-    if (!notoSans.loadFromFile("/home/jeremy/dev/gitted/CBT/NotoSans-Bold.ttf")) {
-        exit(-1);
-    }
-
-    sf::Text titleScreenText;
-    titleScreenText.setFont(notoSans);
-    titleScreenText.setString("Cost and Bill Tracker");
-    titleScreenText.setFillColor(sf::Color::White);
-    titleScreenText.setCharacterSize(30);
-    titleScreenText.setPosition(20, 20);
-    // Button pog(50, 70, 200, 100, testing);
-
-    // Button pog2(300, 0, 100, 500, testing);
-    // pog.setText("Pog", notoSans, 20);
-    // pog2.setText("Pog2", notoSans, 20);
-    // buttons.push_back(&pog);
-    // buttons.push_back(&pog2);
-
-#define TEXT_SPACING 50
-    vector<sf::Text> itemDrawObjects;
-
-    // Created Buy table for what buttons are associated to what item and user
-    vector<ButtonLink> buyTable;
-
-    for (size_t i = 0; i < items.size(); i++) {
-        // Create Text Object
-        sf::Text itemText;
-        itemText.setFont(notoSans);
-        itemText.setString(items[i]->getName());
-        itemText.setPosition(20, TEXT_SPACING * i + TEXT_SPACING + 20);
-        itemDrawObjects.push_back(itemText);
-
-        // Create Button Object
-        for (size_t j = 0; j < users.size(); j++) {
-            Button* userButton = new Button(200 + 150 * j, TEXT_SPACING * i + TEXT_SPACING + 20, 120, 50, toggleButton);
-            userButton->setText(users[j]->getName(), notoSans, 25);
-            userButton->setColor(sf::Color(0xa60d2cff));
-            ButtonLink link;
-            link.item = items[i];
-            link.user = users[j];
-
-            buyTable.push_back(link);
-            buttons.push_back(userButton);
-        }
-    }
-
-    while (window.isOpen()) {
-        handleEvents(window, buttons, buyTable);
-        window.clear(sf::Color(0x181a1b00));
-        window.draw(titleScreenText);
-
-        for (size_t i = 0; i < buttons.size(); i++) {
-            buttons[i]->render(window);
-        }
-
-        for (size_t i = 0; i < itemDrawObjects.size(); i++) {
-            window.draw(itemDrawObjects[i]);
-        }
-
-        window.display();
-        sf::sleep(sf::milliseconds(50));
-    }
-    // delete[] buyTable;
 }

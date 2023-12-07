@@ -13,7 +13,7 @@
 //     this->func = func;
 // }
 
-Button::Button(int x, int y, int width, int height, const std::function<void(Button*, ButtonLink&)> func){
+Button::Button(int x, int y, int width, int height, const std::function<void(Button*, ButtonLink&)> func) {
     this->xPos_ = x;
     this->yPos_ = y;
     this->width_ = width;
@@ -66,14 +66,14 @@ void Button::setText(std::string string, sf::Font& font, int fontSize) {
     this->text_.setPosition(sf::Vector2f(textX, textY));
 }
 
-void Button::callFunc(ButtonLink& link){
+void Button::callFunc(ButtonLink& link) {
     func(this, link);
 }
 
-sf::Color Button::getColor(){
+sf::Color Button::getColor() {
     return color_;
 }
 
-void Button::setColor(sf::Color color){
+void Button::setColor(sf::Color color) {
     this->color_ = color;
 }

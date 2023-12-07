@@ -1,19 +1,18 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 #include <SFML/Graphics.hpp>
-#include <string>
 #include <functional>
+#include <string>
+
 #include "Item.h"
 #include "User.h"
 // typedef std::function<void()> buttonFunction;
-struct ButtonLink
-{
+struct ButtonLink {
     Item* item;
     User* user;
 };
 
 class Button {
-
 private:
     int xPos_;
     int yPos_;

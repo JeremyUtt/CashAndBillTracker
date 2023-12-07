@@ -1,4 +1,5 @@
 #include "User.h"
+
 #include "Item.h"
 
 User::User(std::string name, bool isBuyer) {
@@ -23,10 +24,10 @@ bool User::getBuyerStatus() {
     return isBuyer_;
 }
 
-void User::setTotal(double total){
+void User::setTotal(double total) {
     this->currentTotal = total;
 }
 
-double User::getTotal(){
+double User::getTotal() {
     return this->currentTotal;
 }
