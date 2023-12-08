@@ -79,12 +79,8 @@ void readCSV(vector<User*>& users, vector<Item*>& items) {
     // Read item details from the remaining lines of the file
     string iName, price, quantity;
     while (getline(file, iName, ',')) {
-        cout << iName << endl;
         getline(file, price, ',');
-        cout << price << endl;
-
         getline(file, quantity, '\n');
-        cout << quantity << endl;
 
         // https://www.programiz.com/cpp-programming/string-float-conversion
         Item* item = new Item(iName, stof(price), stoi(quantity));
@@ -169,7 +165,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
     vector<sf::Text> UserTotalUpdateObjects;
 
     // Add header for graphical table
-    const vector<string> tags = {"Name:", "Total:", "Users: (Select All)", "Price Per Person:"};
+    const vector<string> tags = {"Name:", "Total:", "Users: (Select one or more per item)", "Price Per Person:"};
     const vector<int> xPositions = {NAME_START_X, TOTAL_START_X, BUTTON_START_X, BUTTON_START_X + ITEM_X_SPACING + (int)users.size() * (ITEM_X_SPACING + BUTTON_WIDTH)};
     for (size_t i = 0; i < 4; i++) {
         sf::Text tagText;
@@ -261,7 +257,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
         for (size_t i = 0; i < itemUpdateObjects.size(); i++) {
             string text = fltToStr(items[i]->pricePerPerson());
             if (text == "$inf") {
-                text = "Select one or more";
+                text = "Select at least one person";
             }
 
             itemUpdateObjects[i].setString(text);
@@ -304,7 +300,6 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<Butt
                 break;
 
             case sf::Event::MouseMoved:
-                // cout << "Hello world" << endl;
                 for (size_t i = 0; i < buttons.size(); i++) {
                     // changes border color of buttons when hovered over
                     buttons.at(i)->updateHoverStatus(event.mouseMove.x, event.mouseMove.y);
@@ -312,7 +307,7 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<Butt
                 break;
 
             case sf::Event::Resized:
-                // this prevented the window from streaching contents when resized
+                // this prevented the window from stretching contents when resized
                 visibleArea.left = 0;
                 visibleArea.top = 0;
                 visibleArea.width = event.size.width;
@@ -327,7 +322,7 @@ void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<Butt
 }
 
 void userToggleButton(Button* button, ButtonLink& link) {
-    // this will be called by individual buttens when clicked
+    // this will be called by individual buttons when clicked
 
     // define colors for clicked and unclicked
     auto color1 = sf::Color(BUTTON_COLOR_OFF);
@@ -369,7 +364,7 @@ void updateTotals(vector<User*>& users, vector<Item*>& items) {
     }
 
     // Debugging/Redundant Print Statement
-    for (size_t i = 0; i < users.size(); i++) {
-        cout << users[i]->getName() << ": " << users[i]->getTotal() << endl;
-    }
+    // for (size_t i = 0; i < users.size(); i++) {
+    //     cout << users[i]->getName() << ": " << users[i]->getTotal() << endl;
+    // }
 }

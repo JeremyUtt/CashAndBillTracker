@@ -13,7 +13,7 @@
 
 #define TOTAL_START_X 210
 // The starting X position for left most buttons
-#define BUTTON_START_X TOTAL_START_X + 80
+#define BUTTON_START_X TOTAL_START_X + 100
 
 // ======= Spacing =======
 
