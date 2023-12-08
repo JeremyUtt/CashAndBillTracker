@@ -1,0 +1,74 @@
+
+TITLE: 
+Jeremy Utt, CSCI 200 Section B, "Cost and Bill Tracker"
+
+PROBLEM DESCRIPTION:
+I am developing a bill splitter app that simplifies the process of dividing expenses among
+a group of users. The program will store a list (in the form of a vector) of purchased items and
+their prices, allowing each participant to specify whether they are 'in' on any individual item or
+not. The item information is inputted either through the terminal, or through a csv file input.
+The all will then open a SFML window where users can make their selections.
+as users update preferences, the app calculates the amount each individual
+owes to the person who made the purchases. If multiple users contribute to a single item, the
+app evenly distributes the cost among them. This project aims to solve the real world problem
+of me and my roommates splitting the bills after buying groceries. 
+
+PROGRAM DOCUMENTATION:
+This program will need to be build with sfml. The makefile provided is based off the one used in class
+so it should link fine as long as sfml is installed. to use the program, run "make run" or 
+or run ./billTracker directly. There are example CSV input files in the ./examples directory.
+
+In terms of modifying and extending the program, i abstracted a lot of the UI positions and scaling
+into its own file "./include/layout.h". this makes it easier to change colors, 
+move elements around, change font size, etc. 
+
+Some features that I would have liked to add are:
+* enter a filename as a command line argument
+    * this sounds relatively simple, just check for an cmd argument and 
+       immediately call getCSV(string fileName) is found.
+* make the UI look nicer
+    * i was mainly time and creativity restrained on this one
+* allow items to be added/edited/removed from within the GUI
+    * this may require implementing a text input box class to SFML
+
+
+Some things that changed after the proposal were the structure of the classes.
+instead of users storing what item they have, items now store which users have bought them.
+this make a log of internal logic easier to code. In addition, I added a Button class
+to allow input in SFML. most of the Class complexity went into this class as the other 2 
+turned out to be less complex than expected
+
+
+CLASS DESCRIPTION:
+I made 3 custom classes: User, Item, and Button. 
+The Button class has the most complexity.
+it configures and renders a functional button onto a SFML window.
+it does this by checking whether the mouse is within the bounds of the button,
+and changes the outline color if so. when a the mouse is clicked, 
+the event handler finds which button was clicked if any, and tells the button to perform
+its designated action. The button knows what to do through a function pointer, implemented through
+the "#include <functional>" std library.
+
+This class was crucial to tis project as im not sure how i would 
+have interacted with the GUI otherwise
+
+LIST DATA STRUCTURE:
+a used the "std::vector" to store a list of type "User" and "Item" (as well as others).
+this was chosen to to its simplicity to use and because its included in the standard library.
+it was important to the program because i needed to keek track of a arbitrary 
+number of users and items, and be able to access any index in the array.
+
+FILE I/O:
+I implemented file IO through the reading of CSV files containing the users as well 
+as all the items bought. it was necessary to the program because entering data through 
+terminal prompts gets very tedious very quickly
+
+REFLECTIONS:
+The main things I learned were working with arrays and std::vector, as well as dealing
+with SFML windows and reading CSV files. I also gained insights into using function
+pointers in my Button class. I encountered numerous bugs, one of which caused the
+program to segfault during normal execution but worked perfectly when using the GDB
+debugger. Additionally, a considerable amount of troubleshooting was required to set
+up the CSV input to recognize delimiters of both a comma and a newline. One thing i 
+would do next time would be to look into different window library frameworks that are 
+more designed for UI's, such as QT GTK, or imGUI.

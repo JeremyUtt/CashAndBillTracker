@@ -146,7 +146,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
 
     // Load Text Font
     sf::Font notoSans;
-    if (!notoSans.loadFromFile("/home/jeremy/Dev/CBT/NotoSans-Bold.ttf")) {
+    if (!notoSans.loadFromFile("NotoSans-Bold.ttf")) {
         exit(-1);
     }
 

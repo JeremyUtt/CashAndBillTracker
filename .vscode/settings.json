@@ -75,5 +75,8 @@
         "unordered_set": "cpp",
         "source_location": "cpp",
         "stdfloat": "cpp"
-    }
+    },
+    "cSpell.words": [
+        "SFML"
+    ]
 }

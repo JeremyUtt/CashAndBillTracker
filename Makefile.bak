@@ -3,7 +3,7 @@ BUILD_DIR 	:= ./build
 BIN_DIR		:= .
 INCLUDE_DIR := ./include
 
-TARGET := billTracker
+TARGET := CBT
 LIBS := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network
 CFLAGS :=  -I $(INCLUDE_DIR) -c -g -Wall -Wextra -Werror -pedantic-errors -std=c++17
 
@@ -47,4 +47,4 @@ run: all
 $(BUILD_DIR)/main.o: $(SRC_DIR)/main.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h $(INCLUDE_DIR)/Button.h $(INCLUDE_DIR)/layout.h $(INCLUDE_DIR)/main.h
 $(BUILD_DIR)/User.o: $(SRC_DIR)/User.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h
 $(BUILD_DIR)/Item.o: $(SRC_DIR)/Item.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h
-$(BUILD_DIR)/Button.o: $(SRC_DIR)/Button.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h $(INCLUDE_DIR)/Button.h# DEPENDENCIES
+$(BUILD_DIR)/Button.o: $(SRC_DIR)/Button.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h $(INCLUDE_DIR)/Button.h
