@@ -106,7 +106,7 @@ void readCSV(vector<User*>& users, vector<Item*>& items) {
 }
 
 void readManual(vector<User*>& users, vector<Item*>& items) {
-    cout << "Enter name of person Buying: ";
+    cout << "Enter name of person Buying (one word only): ";
     string name;
     cin >> name;
 
@@ -115,7 +115,7 @@ void readManual(vector<User*>& users, vector<Item*>& items) {
 
     // Input other users' names until 'q' is entered
     while (true) {
-        cout << "Enter next users name: (or q to quit)";
+        cout << "Enter next users name: (one word only)(or q to quit)";
         cin >> name;
         if (name == "q") {
             break;
@@ -127,7 +127,7 @@ void readManual(vector<User*>& users, vector<Item*>& items) {
 
     // Input item details until q is entered
     while (true) {
-        cout << "Enter Name of Product (or q to quit):";
+        cout << "Enter Name of Product (one word only)(or q to quit):";
         string input;
         cin >> input;
 
