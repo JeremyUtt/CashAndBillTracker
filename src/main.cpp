@@ -55,6 +55,10 @@ void readCSV(vector<User*>& users, vector<Item*>& items) {
     cin >> fileName;
 
     ifstream file(fileName);
+    if(file.fail()){
+        cerr << "ERROR: File does not exist or is not readable" << endl;
+        exit(-1);
+    }
 
     // Read user names from the first line of the file
     // https://favtutor.com/blogs/split-string-cpp
@@ -138,7 +142,7 @@ void renderWindow(vector<User*>& users, vector<Item*>& items) {
     vector<Button*> buttons;
 
     // https://www.sfml-dev.org/documentation/2.6.1/
-    sf::RenderWindow window(sf::VideoMode(1280, 720, 32), "Cost and Bill Tracker");
+    sf::RenderWindow window(sf::VideoMode(1920, 1080, 32), "Cost and Bill Tracker");
 
     // Load Text Font
     sf::Font notoSans;
