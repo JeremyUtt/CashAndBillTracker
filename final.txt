@@ -14,11 +14,13 @@ app evenly distributes the cost among them. This project aims to solve the real 
 of me and my roommates splitting the bills after buying groceries. 
 
 PROGRAM DOCUMENTATION:
-This program will need to be build with sfml. The makefile provided is based off the one used in class
+This program will need to be built with sfml. The makefile provided is based off the one used in class
 so it should link fine as long as sfml is installed. to use the program, run "make run" or 
 or run ./billTracker directly. There are example CSV input files in the ./examples directory.
+To use the program once the GUI opens, you can click on the user boxes to select them. This will
+this will cause the user selected to "add to cart" the item in the selected column. 
 
-In terms of modifying and extending the program, i abstracted a lot of the UI positions and scaling
+In terms of modifying and extending the program, I abstracted a lot of the UI positions and scaling
 into its own file "./include/layout.h". this makes it easier to change colors, 
 move elements around, change font size, etc. 
 
@@ -27,14 +29,14 @@ Some features that I would have liked to add are:
     * this sounds relatively simple, just check for an cmd argument and 
        immediately call getCSV(string fileName) is found.
 * make the UI look nicer
-    * i was mainly time and creativity restrained on this one
+    * I was mainly time and creativity restrained on this one
 * allow items to be added/edited/removed from within the GUI
     * this may require implementing a text input box class to SFML
 
 
 Some things that changed after the proposal were the structure of the classes.
 instead of users storing what item they have, items now store which users have bought them.
-this make a log of internal logic easier to code. In addition, I added a Button class
+this makes a lot of internal logic easier to code. In addition, I added a Button class
 to allow input in SFML. most of the Class complexity went into this class as the other 2 
 turned out to be less complex than expected
 
@@ -49,13 +51,13 @@ the event handler finds which button was clicked if any, and tells the button to
 its designated action. The button knows what to do through a function pointer, implemented through
 the "#include <functional>" std library.
 
-This class was crucial to tis project as im not sure how i would 
+This class was crucial to tis project as im not sure how I would 
 have interacted with the GUI otherwise
 
 LIST DATA STRUCTURE:
 a used the "std::vector" to store a list of type "User" and "Item" (as well as others).
 this was chosen to to its simplicity to use and because its included in the standard library.
-it was important to the program because i needed to keek track of a arbitrary 
+it was important to the program because I needed to keek track of a arbitrary 
 number of users and items, and be able to access any index in the array.
 
 FILE I/O:
@@ -69,6 +71,6 @@ with SFML windows and reading CSV files. I also gained insights into using funct
 pointers in my Button class. I encountered numerous bugs, one of which caused the
 program to segfault during normal execution but worked perfectly when using the GDB
 debugger. Additionally, a considerable amount of troubleshooting was required to set
-up the CSV input to recognize delimiters of both a comma and a newline. One thing i 
+up the CSV input to recognize delimiters of both a comma and a newline. One thing I 
 would do next time would be to look into different window library frameworks that are 
 more designed for UI's, such as QT GTK, or imGUI.

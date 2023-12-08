@@ -1,22 +1,20 @@
 #ifndef USER_H
 #define USER_H
 #include <string>
-#include <vector>
 class User {
 private:
-    std::string name_;
-    bool isBuyer_;
-    double currentTotal;
+    std::string _name;
+    bool _isBuyer;
+    double _currentTotal;
 
 public:
-    User();
     User(std::string name, bool isBuyer);
     void setName(std::string name);
-    std::string getName();
+    std::string getName() const;
     void setBuyerStatus(bool isBuyer);
-    bool getBuyerStatus();
+    bool getBuyerStatus() const;
     void setTotal(double total);
-    double getTotal();
+    double getTotal() const;
 };
 
 #endif

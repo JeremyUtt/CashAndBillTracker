@@ -1,10 +1,26 @@
-
-// https://www.programiz.com/cpp-programming/string-float-conversion
-// https://favtutor.com/blogs/split-string-cpp
-// https://stackoverflow.com/questions/10376199/how-can-i-use-non-default-delimiters-when-reading-a-text-file-with-stdfstream
-// https://www.sfml-dev.org/documentation/2.6.1/
-// https://www.geeksforgeeks.org/convert-float-to-string-in-cpp/
-// https://stackoverflow.com/questions/41959721/passing-function-to-class-in-c
+/* CSCI 200: Final Project: Cost and Bill Tracker
+ *
+ * Author: Jeremy Utt
+ *
+ * The program will store a list (in the form of a vector) of purchased items and
+ * their prices, allowing each participant to specify whether they are 'in' on any individual item or
+ * not. The item information is inputted either through the terminal, or through a csv file input.
+ * The all will then open a SFML window where users can make their selections.
+ * as users update preferences, the app calculates the amount each individual
+ * owes to the person who made the purchases. If multiple users contribute to a single item, the
+ * app evenly distributes the cost among them. This project aims to solve the real world problem
+ * of me and my roommates splitting the bills after buying groceries.
+ * 
+ * References:
+ * 
+ * https://www.programiz.com/cpp-programming/string-float-conversion
+ * https://favtutor.com/blogs/split-string-cpp
+ * https://stackoverflow.com/questions/10376199/how-can-i-use-non-default-delimiters-when-reading-a-text-file-with-stdfstream
+ * https://www.sfml-dev.org/documentation/2.6.1/
+ * https://www.geeksforgeeks.org/convert-float-to-string-in-cpp/
+ * https://stackoverflow.com/questions/41959721/passing-function-to-class-in-c
+ * 
+ */
 
 #include "main.h"
 

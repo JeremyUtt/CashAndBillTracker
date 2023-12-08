@@ -3,31 +3,31 @@
 #include "Item.h"
 
 User::User(std::string name, bool isBuyer) {
-    this->name_ = name;
-    this->isBuyer_ = isBuyer;
-    this->currentTotal = 0;
+    this->_name = name;
+    this->_isBuyer = isBuyer;
+    this->_currentTotal = 0;
 }
 
 void User::setName(std::string name) {
-    this->name_ = name;
+    this->_name = name;
 }
 
-std::string User::getName() {
-    return name_;
+std::string User::getName() const {
+    return _name;
 }
 
 void User::setBuyerStatus(bool isBuyer) {
-    this->isBuyer_ = isBuyer;
+    this->_isBuyer = isBuyer;
 }
 
-bool User::getBuyerStatus() {
-    return isBuyer_;
+bool User::getBuyerStatus() const {
+    return _isBuyer;
 }
 
 void User::setTotal(double total) {
-    this->currentTotal = total;
+    this->_currentTotal = total;
 }
 
-double User::getTotal() {
-    return this->currentTotal;
+double User::getTotal() const {
+    return this->_currentTotal;
 }

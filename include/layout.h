@@ -7,7 +7,7 @@
 #define NAME_START_Y 60
 
 
-// The buffer inbetween the edge of the window and the title
+// The buffer in between the edge of the window and the title
 #define LEFT_OFFSET 20
 #define TOP_OFFSET 20
 
@@ -20,7 +20,7 @@
 // The x distance between each item
 // (end-to-start)
 #define ITEM_X_SPACING 20
-// The Y distance between each item dispayed
+// The Y distance between each item displayed
 // (start-to-start)
 #define ITEM_Y_SPACING 50
 

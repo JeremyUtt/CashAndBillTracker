@@ -1,10 +1,10 @@
 SRC_DIR 	:= ./src
+INCLUDE_DIR := ./include
 BUILD_DIR 	:= ./build
 BIN_DIR		:= .
-INCLUDE_DIR := ./include
 
 TARGET := billTracker
-LIBS := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lsfml-network
+LIBS := -lsfml-graphics -lsfml-window -lsfml-system
 CFLAGS :=  -I $(INCLUDE_DIR) -c -g -Wall -Wextra -Werror -pedantic-errors -std=c++17
 
 
@@ -22,12 +22,13 @@ endif
 
 all: $(BIN_DIR)/$(TARGET)
 
+# Link objects together
 $(BIN_DIR)/$(TARGET): $(OBJECTS)
 	g++ -o $(BIN_DIR)/$(TARGET) $^ $(LIBS)
 
 # Compile All CPP files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	g++ $(CFLAGS)  -o $@ $< 
+	g++ $(CFLAGS) -o $@ $< 
 
 clean:
 	$(DEL) -f $(TARGET) $(OBJECTS) Makefile.bak
@@ -47,4 +48,4 @@ run: all
 $(BUILD_DIR)/main.o: $(SRC_DIR)/main.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h $(INCLUDE_DIR)/Button.h $(INCLUDE_DIR)/layout.h $(INCLUDE_DIR)/main.h
 $(BUILD_DIR)/User.o: $(SRC_DIR)/User.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h
 $(BUILD_DIR)/Item.o: $(SRC_DIR)/Item.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h
-$(BUILD_DIR)/Button.o: $(SRC_DIR)/Button.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h $(INCLUDE_DIR)/Button.h# DEPENDENCIES
+$(BUILD_DIR)/Button.o: $(SRC_DIR)/Button.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h $(INCLUDE_DIR)/Button.h
