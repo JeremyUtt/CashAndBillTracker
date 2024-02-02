@@ -1,25 +1,20 @@
 #ifndef USER_H
 #define USER_H
 #include <string>
-#include <vector>
-#include <Item.h>
-class User
-{
+class User {
 private:
-    std::string name_;
-    bool isBuyer_;
-    std::vector<Item*> items_;
+    std::string _name;
+    bool _isBuyer;
+    double _currentTotal;
+
 public:
-    User();
     User(std::string name, bool isBuyer);
-    void addItem(Item* item);
-    void removeItem(Item* item);
-    int calcuateTotal();
     void setName(std::string name);
-    std::string getName();
+    std::string getName() const;
     void setBuyerStatus(bool isBuyer);
-    bool getBuyerStatus();
-    std::vector<Item*> getAddedItems();
+    bool getBuyerStatus() const;
+    void setTotal(double total);
+    double getTotal() const;
 };
 
 #endif

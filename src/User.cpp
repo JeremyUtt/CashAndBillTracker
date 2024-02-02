@@ -1,47 +1,33 @@
 #include "User.h"
+
 #include "Item.h"
-User::User() {
-}
 
 User::User(std::string name, bool isBuyer) {
-    this->name_ = name;
-    this->isBuyer_ = isBuyer;
-}
-
-void User::addItem(Item* item) {
-    items_.push_back(item);
-}
-
-void User::removeItem(Item* item) {
-    // items.erase(5);
-}
-
-int User::calcuateTotal() {
-    int sum;
-    for (size_t i = 0; i < items_.size(); i++)
-    {
-        sum += items_[i]->getTotalPrice();
-    }
-    return sum;
+    this->_name = name;
+    this->_isBuyer = isBuyer;
+    this->_currentTotal = 0;
 }
 
 void User::setName(std::string name) {
-    this->name_ = name;
+    this->_name = name;
 }
 
-std::string User::getName() {
-    return name_;
+std::string User::getName() const {
+    return _name;
 }
 
 void User::setBuyerStatus(bool isBuyer) {
-    this->isBuyer_ = isBuyer;
+    this->_isBuyer = isBuyer;
 }
 
-bool User::getBuyerStatus() {
-    return isBuyer_;
+bool User::getBuyerStatus() const {
+    return _isBuyer;
 }
 
-std::vector<Item* > User::getAddedItems() {
-    return items_;
+void User::setTotal(double total) {
+    this->_currentTotal = total;
 }
 
+double User::getTotal() const {
+    return this->_currentTotal;
+}

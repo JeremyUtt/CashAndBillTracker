@@ -1,30 +1,40 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 #include <SFML/Graphics.hpp>
-#include <string>
 #include <functional>
+#include <string>
 
-typedef std::function<void()> buttonFunction;
+#include "Item.h"
+#include "User.h"
+
+struct ButtonLink {
+    Item* item;
+    User* user;
+};
 
 class Button {
 private:
-    int xPos;
-    int yPos;
-    int width;
-    int height;
-    bool active;
-    bool hasText;
-    bool hovered;
-    sf::Text text;
-    buttonFunction func;
+    int _xPos;
+    int _yPos;
+    int _width;
+    int _height;
+    bool _active;
+    bool _hasText;
+    bool _hovered;
+    sf::Text _text;
+    sf::Color _color;
+    // https://stackoverflow.com/questions/41959721/passing-function-to-class-in-c
+    // (i made this part before learning function pointers in class)
+    std::function<void(Button*, ButtonLink&)> _func;
 
 public:
-    Button(int x, int y, int width, int height, const buttonFunction& func);
+    Button(int x, int y, int width, int height, const std::function<void(Button*, ButtonLink&)> func);
     bool updateHoverStatus(int mouseX, int mouseY);
-    void render(sf::RenderWindow& window);
+    void render(sf::RenderWindow& window) const;
     void setActiveStatus(bool status);
     void setText(std::string text, sf::Font& font, int fontSize);
-    void callFunc();
+    sf::Color getColor() const;
+    void setColor(sf::Color color);
+    void callFunc(ButtonLink& link);
 };
-
 #endif

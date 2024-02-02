@@ -1,4 +1,6 @@
 bin
-build
-main
+build/*
 .VSCodeCounter
+CBT
+billTracker
+CSCI200Final.zip
