@@ -10,27 +10,52 @@
  * owes to the person who made the purchases. If multiple users contribute to a single item, the
  * app evenly distributes the cost among them. This project aims to solve the real world problem
  * of me and my roommates splitting the bills after buying groceries.
- * 
+ *
  * References:
- * 
+ *
  * https://www.programiz.com/cpp-programming/string-float-conversion
  * https://favtutor.com/blogs/split-string-cpp
  * https://stackoverflow.com/questions/10376199/how-can-i-use-non-default-delimiters-when-reading-a-text-file-with-stdfstream
  * https://www.sfml-dev.org/documentation/2.6.1/
  * https://www.geeksforgeeks.org/convert-float-to-string-in-cpp/
  * https://stackoverflow.com/questions/41959721/passing-function-to-class-in-c
- * 
+ *
  */
 
 #include "main.h"
+
+#include <GLFW/glfw3.h>
+#include <stdio.h>
 
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 #include "layout.h"
+#include <unordered_map>
+#include <utility> // for std::pair
+
+
+
 using namespace std;
+using namespace ImGui;
+
+const char* title = "Application title";
+const int width = 1280;
+const int height = 720;
+ImFont* font1;
+
+struct ButtonLink {
+    Item* item;
+    User* user;
+};
+
+
+void app(GLFWwindow* window, vector<User*>& users, vector<Item*>& items, bool* buyTable);
 
 int main() {
     vector<Item*> items;
@@ -60,9 +85,275 @@ int main() {
             cout << "Invalid choice" << endl;
         }
     }
-    renderWindow(users, items);
-    return 0;
+
+    bool* buyTable = new bool[users.size() * items.size()];
+
+    std::cout << users.size() * items.size() << std::endl;
+
+    for (size_t i = 0; i < users.size() * items.size(); i++)
+    {
+        buyTable[i] = false;
+        // std::cout << buyTable[i] << std::endl;
+    }
+    
+
+
+    if (!glfwInit()) {
+        return 1;
+    }
+
+    GLFWwindow* window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+    if (window == nullptr) {
+        return 1;
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);  // Enable vsync
+
+    // int width, height, channels;
+    // unsigned char* pixels = stbi_load("/home/jeremy/Dev/ImGuiTest/icon.png", &width, &height, &channels, 4);
+
+    // GLFWimage images[1];
+    // images[0].width = width;
+    // images[0].height = height;
+    // images[0].pixels = pixels;
+    // glfwSetWindowIcon(window, 1, images);
+
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 130");
+
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    ImGuiIO& io = ImGui::GetIO();
+    font1 = io.Fonts->AddFontFromFileTTF("/home/jeremy/Dev/CBT/NotoSans-Bold.ttf", 20);
+
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        app(window, users, items, buyTable);
+
+        ImGui::Render();
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+
+        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(window);
+    }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
+
+const vector<string> tags = {"Name:", "Total:", "Users: (Select one or more per item)", "Price Per Person:"};
+void app(GLFWwindow* window, vector<User*>& users, vector<Item*>& items, bool* buyTable) {
+    using namespace ImGui;
+
+    Begin("Fullscreen Window",
+          NULL,
+          ImGuiWindowFlags_NoResize |
+              ImGuiWindowFlags_NoMove |
+              ImGuiWindowFlags_NoCollapse |
+              ImGuiWindowFlags_NoTitleBar |
+              ImGuiWindowFlags_NoBringToFrontOnFocus);
+    // Begin("Table");
+
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+
+    SetWindowSize(ImVec2(width, height));
+    SetWindowPos(ImVec2(0, 0));
+
+    ImGui::PushFont(font1);
+    Text("Cost and Bill Tracker");
+
+    // Add header for graphical table
+    // const vector<int> xPositions = {NAME_START_X, TOTAL_START_X, BUTTON_START_X, BUTTON_START_X + ITEM_X_SPACING + (int)users.size() * (ITEM_X_SPACING + BUTTON_WIDTH)};
+
+    if (BeginTable("main", 3 + users.size(), ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX)) {
+        for (size_t i = 0; i < 2; i++) {
+            TableNextColumn();
+            TableHeader(tags[i].c_str());
+        }
+        for (size_t i = 0; i < users.size() + 1; i++) {
+            TableHeader("");
+            TableNextColumn();
+        }
+        TableHeader(tags[3].c_str());
+
+        // TableNextRow();
+
+        // Repeat for every item in the list
+        for (size_t i = 0; i < items.size(); i++) {
+            // Create Name coloum
+
+            TableNextColumn();
+            Text(items[i]->getName().c_str());
+
+            // Create Total (2nd) coloum
+            TableNextColumn();
+            Text(fltToStr(items[i]->getTotalPrice()).c_str());
+
+            // Create Button Objects
+            for (size_t j = 0; j < users.size(); j++) {
+                TableNextColumn();
+                
+                std::cout << i << " " << j << std::endl;
+                
+                bool state;
+
+                bool clicked = Checkbox(users[j]->getName().c_str(), &state);
+                if (clicked) {
+                    std::cout << "Hi" << std::endl;
+                    if (buyTable[i * users.size() + j]) {
+                        items[i]->addUser(users[j]);
+                    } else {
+                        items[i]->removeUser(users[j]);
+                    }
+                }
+            }
+
+            // Create Price Per Person (last) column
+            string text = fltToStr(items[i]->pricePerPerson());
+            if (text == "$inf") {
+                text = "Select at least one person";
+            }
+
+            TableNextColumn();
+            Text(text.c_str());
+
+            // TableNextRow();
+        }
+        EndTable();
+    }
+
+    ImGui::PopFont();
+
+    End();
+
+    /*
+    vector<ButtonLink> buyTable;
+
+
+
+    // Create section that will contain each users total cost
+    for (size_t i = 0; i < users.size(); i++) {
+        // List Everyones names
+        sf::Text peopleNames;
+        peopleNames.setFont(notoSans);
+        peopleNames.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), ITEM_Y_SPACING * (items.size() + 2) + NAME_START_Y);
+        peopleNames.setCharacterSize(FONT_SIZE);
+        peopleNames.setString(users[i]->getName());
+        itemDrawObjects.push_back(peopleNames);
+
+        // Below each name, print their total price
+        sf::Text peopleTotals;
+        peopleTotals.setFont(notoSans);
+        peopleTotals.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), ITEM_Y_SPACING * (items.size() + 2) + NAME_START_Y + USER_SPACING_Y);
+        peopleTotals.setCharacterSize(FONT_SIZE);
+        UserTotalUpdateObjects.push_back(peopleTotals);
+    }
+
+    // Start main draw loop
+    while (window.isOpen()) {
+        handleEvents(window, buttons, buyTable, users, items);
+        window.clear(sf::Color(BACKGROUND_COLOR));
+        window.draw(titleScreenText);
+
+        // Draw all Item Names
+        for (size_t i = 0; i < itemDrawObjects.size(); i++) {
+            window.draw(itemDrawObjects[i]);
+        }
+
+        // Draw All Buttons
+        for (size_t i = 0; i < buttons.size(); i++) {
+            buttons[i]->render(window);
+        }
+
+        // Draw some text items that values will update over time
+        for (size_t i = 0; i < itemUpdateObjects.size(); i++) {
+            string text = fltToStr(items[i]->pricePerPerson());
+            if (text == "$inf") {
+                text = "Select at least one person";
+            }
+
+            itemUpdateObjects[i].setString(text);
+            window.draw(itemUpdateObjects[i]);
+        }
+
+        // Draw more text items that values will update over time
+        for (size_t i = 0; i < UserTotalUpdateObjects.size(); i++) {
+            string text = fltToStr(users[i]->getTotal());
+            UserTotalUpdateObjects[i].setString(text);
+            window.draw(UserTotalUpdateObjects[i]);
+        }
+
+        window.display();
+        sf::sleep(sf::milliseconds(50));
+    } */
+}
+
+// void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<ButtonLink> buyTable, vector<User*>& users, vector<Item*>& items) {
+//     sf::Event event;
+//     while (window.pollEvent(event)) {
+//         sf::FloatRect visibleArea;
+//         switch (event.type) {
+//             case sf::Event::Closed:
+//                 window.close();
+//                 break;
+
+//             case sf::Event::MouseButtonPressed:
+//                 if (event.mouseButton.button == sf::Mouse::Left) {
+//                     for (size_t i = 0; i < buttons.size(); i++) {
+//                         // if button is clicked on, call its assisiated function
+//                         if (buttons.at(i)->updateHoverStatus(event.mouseButton.x, event.mouseButton.y)) {
+//                             buttons.at(i)->callFunc(buyTable[i]);
+
+//                             // Update User Totals
+//                             updateTotals(users, items);
+//                         }
+//                     }
+//                 }
+//                 break;
+
+//             case sf::Event::MouseMoved:
+//                 for (size_t i = 0; i < buttons.size(); i++) {
+//                     // changes border color of buttons when hovered over
+//                     buttons.at(i)->updateHoverStatus(event.mouseMove.x, event.mouseMove.y);
+//                 }
+//                 break;
+
+//             case sf::Event::Resized:
+//                 // this prevented the window from stretching contents when resized
+//                 visibleArea.left = 0;
+//                 visibleArea.top = 0;
+//                 visibleArea.width = event.size.width;
+//                 visibleArea.height = event.size.height;
+//                 window.setView(sf::View(visibleArea));
+//                 break;
+
+//             default:
+//                 break;
+//         }
+//     }
+// }
+
+// Good
 
 void readCSV(vector<User*>& users, vector<Item*>& items) {
     // Prompt user for file name
@@ -71,7 +362,7 @@ void readCSV(vector<User*>& users, vector<Item*>& items) {
     cin >> fileName;
 
     ifstream file(fileName);
-    if(file.fail()){
+    if (file.fail()) {
         cerr << "ERROR: File does not exist or is not readable" << endl;
         exit(-1);
     }
@@ -149,212 +440,24 @@ void readManual(vector<User*>& users, vector<Item*>& items) {
     }
 }
 
-void renderWindow(vector<User*>& users, vector<Item*>& items) {
-    // Create Buttons array
-    vector<Button*> buttons;
+// void userToggleButton(Button* button, ButtonLink& link) {
+//     // this will be called by individual buttons when clicked
 
-    // https://www.sfml-dev.org/documentation/2.6.1/
-    sf::RenderWindow window(sf::VideoMode(1920, 1080, 32), "Cost and Bill Tracker");
+//     // define colors for clicked and unclicked
+//     auto color1 = sf::Color(BUTTON_COLOR_OFF);
+//     auto color2 = sf::Color(BUTTON_COLOR_ON);
 
-    // Load Text Font
-    sf::Font notoSans;
-    if (!notoSans.loadFromFile("NotoSans-Bold.ttf")) {
-        exit(-1);
-    }
+//     // use the color of the button to determine its 'state'
+//     if (button->getColor() == color1) {
+//         button->setColor(color2);
+//         link.item->addUser(link.user);
 
-    // Create Title Text
-    sf::Text titleScreenText;
-    titleScreenText.setFont(notoSans);
-    titleScreenText.setString("Cost and Bill Tracker");
-    titleScreenText.setFillColor(sf::Color::White);
-    titleScreenText.setCharacterSize(30);
-    titleScreenText.setPosition(LEFT_OFFSET, TOP_OFFSET);
-
-    // Create Buy table for what buttons are associated to what item and user
-    // only the toggle buttons for adding items to a users cart should be added to this list
-    vector<ButtonLink> buyTable;
-
-    // Interface for all items to buy
-    // these vectors will be looped over in the draw loop to render
-    vector<sf::Text> itemDrawObjects;
-    vector<sf::Text> itemUpdateObjects;
-    vector<sf::Text> UserTotalUpdateObjects;
-
-    // Add header for graphical table
-    const vector<string> tags = {"Name:", "Total:", "Users: (Select one or more per item)", "Price Per Person:"};
-    const vector<int> xPositions = {NAME_START_X, TOTAL_START_X, BUTTON_START_X, BUTTON_START_X + ITEM_X_SPACING + (int)users.size() * (ITEM_X_SPACING + BUTTON_WIDTH)};
-    for (size_t i = 0; i < 4; i++) {
-        sf::Text tagText;
-        tagText.setFont(notoSans);
-        tagText.setString(tags[i]);
-        tagText.setPosition(xPositions[i], TOP_OFFSET + ITEM_Y_SPACING);
-        tagText.setCharacterSize(FONT_SIZE);
-        itemDrawObjects.push_back(tagText);
-    }
-
-    // Repeat for every item in the list
-    for (size_t i = 0; i < items.size(); i++) {
-        // Create Name coloum
-        sf::Text nameText;
-        nameText.setFont(notoSans);
-        nameText.setString(items[i]->getName());
-        nameText.setPosition(NAME_START_X, ITEM_Y_SPACING * (i + 1) + NAME_START_Y);
-        nameText.setCharacterSize(FONT_SIZE);
-        itemDrawObjects.push_back(nameText);
-
-        // Create Total (2nd) coloum
-        sf::Text totalText;
-        totalText.setFont(notoSans);
-        totalText.setString(fltToStr(items[i]->getTotalPrice()));
-        totalText.setPosition(TOTAL_START_X, ITEM_Y_SPACING * (i + 1) + NAME_START_Y);
-        totalText.setCharacterSize(FONT_SIZE);
-        itemDrawObjects.push_back(totalText);
-
-        // Create Button Objects
-        for (size_t j = 0; j < users.size(); j++) {
-            Button* userButton = new Button(BUTTON_START_X + (ITEM_X_SPACING + BUTTON_WIDTH) * j,
-                                            ITEM_Y_SPACING * (i + 1) + NAME_START_Y,
-                                            BUTTON_WIDTH,
-                                            BUTTON_HEIGHT,
-                                            userToggleButton);
-            userButton->setText(users[j]->getName(), notoSans, FONT_SIZE);
-            userButton->setColor(sf::Color(BUTTON_COLOR_OFF));
-            ButtonLink link;
-            link.item = items[i];
-            link.user = users[j];
-
-            buyTable.push_back(link);
-            buttons.push_back(userButton);
-        }
-
-        // Create Price Per Person (last) coloum
-        sf::Text pppText;
-        pppText.setFont(notoSans);
-        pppText.setPosition((BUTTON_WIDTH + ITEM_X_SPACING) * users.size() + ITEM_X_SPACING + BUTTON_START_X, ITEM_Y_SPACING * (i + 1) + NAME_START_Y);
-        pppText.setCharacterSize(FONT_SIZE);
-        itemUpdateObjects.push_back(pppText);
-    }
-
-    // Create section that will contain each users total cost
-    for (size_t i = 0; i < users.size(); i++) {
-        // List Everyones names
-        sf::Text peopleNames;
-        peopleNames.setFont(notoSans);
-        peopleNames.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), ITEM_Y_SPACING * (items.size() + 2) + NAME_START_Y);
-        peopleNames.setCharacterSize(FONT_SIZE);
-        peopleNames.setString(users[i]->getName());
-        itemDrawObjects.push_back(peopleNames);
-
-        // Below each name, print their total price
-        sf::Text peopleTotals;
-        peopleTotals.setFont(notoSans);
-        peopleTotals.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), ITEM_Y_SPACING * (items.size() + 2) + NAME_START_Y + USER_SPACING_Y);
-        peopleTotals.setCharacterSize(FONT_SIZE);
-        UserTotalUpdateObjects.push_back(peopleTotals);
-    }
-
-    // Start main draw loop
-    while (window.isOpen()) {
-        handleEvents(window, buttons, buyTable, users, items);
-        window.clear(sf::Color(BACKGROUND_COLOR));
-        window.draw(titleScreenText);
-
-        // Draw all Item Names
-        for (size_t i = 0; i < itemDrawObjects.size(); i++) {
-            window.draw(itemDrawObjects[i]);
-        }
-
-        // Draw All Buttons
-        for (size_t i = 0; i < buttons.size(); i++) {
-            buttons[i]->render(window);
-        }
-
-        // Draw some text items that values will update over time
-        for (size_t i = 0; i < itemUpdateObjects.size(); i++) {
-            string text = fltToStr(items[i]->pricePerPerson());
-            if (text == "$inf") {
-                text = "Select at least one person";
-            }
-
-            itemUpdateObjects[i].setString(text);
-            window.draw(itemUpdateObjects[i]);
-        }
-
-        // Draw more text items that values will update over time
-        for (size_t i = 0; i < UserTotalUpdateObjects.size(); i++) {
-            string text = fltToStr(users[i]->getTotal());
-            UserTotalUpdateObjects[i].setString(text);
-            window.draw(UserTotalUpdateObjects[i]);
-        }
-
-        window.display();
-        sf::sleep(sf::milliseconds(50));
-    }
-}
-
-void handleEvents(sf::RenderWindow& window, vector<Button*> buttons, vector<ButtonLink> buyTable, vector<User*>& users, vector<Item*>& items) {
-    sf::Event event;
-    while (window.pollEvent(event)) {
-        sf::FloatRect visibleArea;
-        switch (event.type) {
-            case sf::Event::Closed:
-                window.close();
-                break;
-
-            case sf::Event::MouseButtonPressed:
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    for (size_t i = 0; i < buttons.size(); i++) {
-                        // if button is clicked on, call its assisiated function
-                        if (buttons.at(i)->updateHoverStatus(event.mouseButton.x, event.mouseButton.y)) {
-                            buttons.at(i)->callFunc(buyTable[i]);
-
-                            // Update User Totals
-                            updateTotals(users, items);
-                        }
-                    }
-                }
-                break;
-
-            case sf::Event::MouseMoved:
-                for (size_t i = 0; i < buttons.size(); i++) {
-                    // changes border color of buttons when hovered over
-                    buttons.at(i)->updateHoverStatus(event.mouseMove.x, event.mouseMove.y);
-                }
-                break;
-
-            case sf::Event::Resized:
-                // this prevented the window from stretching contents when resized
-                visibleArea.left = 0;
-                visibleArea.top = 0;
-                visibleArea.width = event.size.width;
-                visibleArea.height = event.size.height;
-                window.setView(sf::View(visibleArea));
-                break;
-
-            default:
-                break;
-        }
-    }
-}
-
-void userToggleButton(Button* button, ButtonLink& link) {
-    // this will be called by individual buttons when clicked
-
-    // define colors for clicked and unclicked
-    auto color1 = sf::Color(BUTTON_COLOR_OFF);
-    auto color2 = sf::Color(BUTTON_COLOR_ON);
-
-    // use the color of the button to determine its 'state'
-    if (button->getColor() == color1) {
-        button->setColor(color2);
-        link.item->addUser(link.user);
-
-    } else {
-        button->setColor(color1);
-        link.item->removeUser(link.user);
-        // price *= -1;
-    }
-}
+//     } else {
+//         button->setColor(color1);
+//         link.item->removeUser(link.user);
+//         // price *= -1;
+//     }
+// }
 
 string fltToStr(float num) {
     // Converts a float to a string

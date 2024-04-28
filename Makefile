@@ -1,24 +1,14 @@
 SRC_DIR 	:= ./src
-INCLUDE_DIR := ./include
+INCLUDE_DIRS := -I./include -I/home/jeremy/GitRepos/imgui/ -I/home/jeremy/GitRepos/imgui/backends
 BUILD_DIR 	:= ./build
 BIN_DIR		:= .
 
 TARGET := billTracker
-LIBS := -lsfml-graphics -lsfml-window -lsfml-system
-CFLAGS :=  -I $(INCLUDE_DIR) -c -g -Wall -Wextra -Werror -pedantic-errors -std=c++17
-
+LIBS := -Llib -lglfw -lGL -limgui
+CFLAGS := $(INCLUDE_DIRS) -c -g
 
 CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(CPP_FILES)) \
-
-ifeq ($(shell echo "Windows"), "Windows")
-	TARGET := $(TARGET).exe
-	DEL = del
-	Q = 
-else
-	DEL = rm -f
-	Q = "
-endif
 
 all: $(BIN_DIR)/$(TARGET)
 
@@ -31,7 +21,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	g++ $(CFLAGS) -o $@ $< 
 
 clean:
-	$(DEL) -f $(TARGET) $(OBJECTS) Makefile.bak
+	rm $(TARGET) $(OBJECTS) Makefile.bak
 
 depend:
 	@sed -i.bak '/^# DEPENDENCIES/,$$d' Makefile
@@ -45,7 +35,7 @@ run: all
 	@./$(BIN_DIR)/$(TARGET)
 
 # Dependencies:
-$(BUILD_DIR)/main.o: $(SRC_DIR)/main.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h $(INCLUDE_DIR)/Button.h $(INCLUDE_DIR)/layout.h $(INCLUDE_DIR)/main.h
-$(BUILD_DIR)/User.o: $(SRC_DIR)/User.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h
-$(BUILD_DIR)/Item.o: $(SRC_DIR)/Item.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h
-$(BUILD_DIR)/Button.o: $(SRC_DIR)/Button.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h $(INCLUDE_DIR)/Button.h
+# $(BUILD_DIR)/main.o: $(SRC_DIR)/main.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h $(INCLUDE_DIR)/Button.h $(INCLUDE_DIR)/layout.h $(INCLUDE_DIR)/main.h
+# $(BUILD_DIR)/User.o: $(SRC_DIR)/User.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h
+# $(BUILD_DIR)/Item.o: $(SRC_DIR)/Item.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h
+# $(BUILD_DIR)/Button.o: $(SRC_DIR)/Button.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h $(INCLUDE_DIR)/Button.h
