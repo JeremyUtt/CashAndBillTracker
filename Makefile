@@ -6,7 +6,7 @@ BUILD_DIR 	:= ./build
 BIN_DIR		:= .
 
 TARGET := billTracker
-LIBS := -lglfw -lGL
+LIBS := -Llib -lglfw -lGL -limgui
 CFLAGS := $(INCLUDE_DIRS) -c -g -O0
 
 CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
@@ -18,18 +18,20 @@ IMGUI_SRC += $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp $(IMGUI_DIR)/backends/img
 
 
 all: $(BIN_DIR)/$(TARGET)
+imgui: lib/imgui.a
+
 
 # Link objects together
-$(BIN_DIR)/$(TARGET): $(OBJECTS) lib/imgui.a
-	g++ -o $(BIN_DIR)/$(TARGET) $^ lib/imgui.a $(LIBS)
+$(BIN_DIR)/$(TARGET): $(OBJECTS) 
+	g++ -o $(BIN_DIR)/$(TARGET) $^ $(LIBS)
 
 # Compile All main CPP files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	g++ $(CFLAGS) -o $@ $< 
 
 # Compile All imgui CPP files
-lib/imgui.a: $(IMGUI_SRC)
-	g++ $(CFLAGS) -o $@ $< 
+# lib/imgui.a: $(IMGUI_SRC)
+# g++ $(CFLAGS) -o $@ $< 
 
 clean:
 	@rm -rf $(TARGET) $(OBJECTS) Makefile.bak
@@ -52,9 +54,10 @@ lib/libimgui.so: $(SOURCES)
 	g++ -fPIC -shared $(SOURCES) -o lib/libimgui.so -I$(IMGUI_DIR)
 
 
-libs: lib/imgui.a
 
-
+debug:
+	@echo $(OBJECTS)
+	@echo $(IMGUI_SRC)
 
 # Dependencies:
 # $(BUILD_DIR)/main.o: $(SRC_DIR)/main.cpp $(INCLUDE_DIR)/User.h $(INCLUDE_DIR)/Item.h $(INCLUDE_DIR)/Button.h $(INCLUDE_DIR)/layout.h $(INCLUDE_DIR)/main.h

@@ -122,6 +122,7 @@ int main(int argc, char** argv) {
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = nullptr;
     font1 = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), titleFontSize);
     font2 = io.Fonts->AddFontFromFileTTF(fontPath.c_str(), fontSize);
 
