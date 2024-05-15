@@ -1,5 +1,4 @@
-#ifndef USER_H
-#define USER_H
+#pragma once
 #include <string>
 class User {
 private:
@@ -16,5 +15,3 @@ public:
     void setTotal(double total);
     double getTotal() const;
 };
-
-#endif

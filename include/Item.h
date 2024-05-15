@@ -1,6 +1,4 @@
-#ifndef ITEM_H
-#define ITEM_H
-
+#pragma once
 #include <string>
 #include <vector>
 
@@ -35,5 +33,3 @@ public:
     double pricePerPerson() const;
     // void updateUserTotals();
 };
-
-#endif
