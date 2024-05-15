@@ -5,7 +5,7 @@ BIN_DIR		:= .
 
 TARGET := billTracker
 LIBS := -Llib -lglfw -lGL -limgui
-CFLAGS := $(INCLUDE_DIRS) -c -g
+CFLAGS := $(INCLUDE_DIRS) -c -g -O0
 
 CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(CPP_FILES)) \

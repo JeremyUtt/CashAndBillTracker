@@ -71,19 +71,3 @@ std::vector<User*> Item::getAddedUsers() const {
 double Item::pricePerPerson() const {
     return getTotalPrice() / _users.size();
 }
-
-// void Item::updateUserTotals() {
-//     for (size_t i = 0; i < items.size(); i++) {
-//         auto addedUsers = items[i]->getAddedUsers();
-//         auto price = items[i]->pricePerPerson();
-//         // For each participating user, add the items pricePerPerson() to their total
-//         for (size_t j = 0; j < addedUsers.size(); j++) {
-//             addedUsers[j]->setTotal(addedUsers[j]->getTotal() + price);
-//         }
-//     }
-
-//     // Debugging/Redundant Print Statement
-//     for (size_t i = 0; i < users.size(); i++) {
-//         cout << users[i]->getName() << ": " << users[i]->getTotal() << endl;
-//     }
-// }
