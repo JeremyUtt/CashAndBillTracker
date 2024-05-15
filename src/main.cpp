@@ -39,40 +39,49 @@
 using namespace std;
 using namespace ImGui;
 
-const char* title = "Application title";
+const char* title = "Cost and Bill Tracker";
 const int width = 1280;
 const int height = 720;
 const string fontPath = "/home/jeremy/Dev/CBT/NotoSans-Bold.ttf";
 const int titleFontSize = 35;
 const int fontSize = 25;
 
-
-int main() {
+int main(int argc, char** argv) {
     vector<Item*> items;
     vector<User*> users;
 
     // Ask user for type of data input
-    while (true) {
-        cout << "How would you like in input the data?" << endl;
-        cout << "1. A CSV File, 2. Manually (1,2):";
-        int choice;
-        cin >> choice;
-        // Check id wrong datatype entered (or other failure)
-        if (cin.fail()) {
-            cin.clear();
-            cout << "Invalid choice" << endl;
-            continue;
-        }
-        if (choice == 1) {
-            // function will modify the users and items vector
-            readCSV(users, items);
-            break;
-        } else if (choice == 2) {
-            // function will modify the users and items vector
-            readManual(users, items);
-            break;
-        } else {
-            cout << "Invalid choice" << endl;
+
+    if (argc == 2) {
+        readCSV(argv[1], users, items);
+    } else {
+        while (true) {
+            cout << "How would you like in input the data?" << endl;
+            cout << "1. A CSV File, 2. Manually (1,2):";
+            int choice;
+            cin >> choice;
+            // Check id wrong datatype entered (or other failure)
+            if (cin.fail()) {
+                cin.clear();
+                cout << "Invalid choice" << endl;
+                continue;
+            }
+            if (choice == 1) {
+                // function will modify the users and items vector
+                // Prompt user for file name
+                cout << "Enter Filename:";
+                string fileName;
+                cin >> fileName;
+
+                readCSV(fileName, users, items);
+                break;
+            } else if (choice == 2) {
+                // function will modify the users and items vector
+                readManual(users, items);
+                break;
+            } else {
+                cout << "Invalid choice" << endl;
+            }
         }
     }
 
@@ -146,12 +155,7 @@ int main() {
     glfwTerminate();
 }
 
-void readCSV(vector<User*>& users, vector<Item*>& items) {
-    // Prompt user for file name
-    cout << "Enter Filename:";
-    string fileName;
-    cin >> fileName;
-
+void readCSV(string fileName, vector<User*>& users, vector<Item*>& items) {
     ifstream file(fileName);
     if (file.fail()) {
         cerr << "ERROR: File does not exist or is not readable" << endl;
