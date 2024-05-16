@@ -6,7 +6,7 @@ BUILD_DIR 	:= ./build
 BIN_DIR		:= .
 
 TARGET := billTracker
-LIBS := -Llib -lglfw -lGL -limgui
+LIBS := -lglfw -lGL
 CFLAGS := $(INCLUDE_DIRS) -c -g -O0
 
 CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
@@ -16,13 +16,13 @@ IMGUI_SRC := $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/img
 IMGUI_SRC += $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 
 
-
 all: $(BIN_DIR)/$(TARGET)
 imgui: lib/imgui.a
+dynimgui: lib/libimgui.so 
 
 
 # Link objects together
-$(BIN_DIR)/$(TARGET): $(OBJECTS) 
+$(BIN_DIR)/$(TARGET): $(OBJECTS) lib/imgui.a
 	g++ -o $(BIN_DIR)/$(TARGET) $^ $(LIBS)
 
 # Compile All main CPP files
@@ -30,8 +30,12 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	g++ $(CFLAGS) -o $@ $< 
 
 # Compile All imgui CPP files
-# lib/imgui.a: $(IMGUI_SRC)
-# g++ $(CFLAGS) -o $@ $< 
+lib/imgui.a: $(IMGUI_SRC)
+	cd build && g++ -c $(IMGUI_SRC) -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
+	ar rcs $@ *.o
+
+
+# OTHER
 
 clean:
 	@rm -rf $(TARGET) $(OBJECTS) Makefile.bak
@@ -47,13 +51,8 @@ depend:
 run: all
 	@./$(BIN_DIR)/$(TARGET)
 
-
-dynlibs: lib/libimgui.so 
-
 lib/libimgui.so: $(SOURCES)
 	g++ -fPIC -shared $(SOURCES) -o lib/libimgui.so -I$(IMGUI_DIR)
-
-
 
 debug:
 	@echo $(OBJECTS)
