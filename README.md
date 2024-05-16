@@ -19,5 +19,7 @@ Install dependencies:
 
 - run `make`
 
+- optionally: run `make install` to install binary, icon, and .desktop file to youe system (requires sudo)
+
 # Usage
 you can either pass in a csv file as a command line argument, or just open the app on its own. you can add items and users to the list through the provided imgui windows
