@@ -41,6 +41,12 @@ lib/imgui.a: $(IMGUI_SRC)
 
 # OTHER
 
+install: all
+	@sudo cp $(BIN_DIR)/$(TARGET) /usr/local/bin
+	@sudo cp CBT.desktop /usr/share/applications 
+	@sudo cp icon.ico /usr/share/icons/cbt.ico 
+
+
 clean:
 	@rm -rf $(TARGET) $(OBJECTS) Makefile.bak
 

@@ -1,19 +1,16 @@
 #!/usr/bin/env xdg-open
 [Desktop Entry]
 Categories=Utilities;
-Comment[en_US]=Hello World
-Comment=Hello World
+Comment[en_US]=She Track on my Bill till I Cost
+Comment=She Track on my Bill till I Cost
 Exec=billTracker
 GenericName[en_US]=CBT
 GenericName=CBT
-Icon=akregator-symbolic
+Icon=/usr/share/icons/cbt.ico
 MimeType=text/csv;
 Name[en_US]=Cost and Bill Tracker
 Name=Cost and Bill Tracker
-Path=
-StartupNotify=true
+StartupNotify=false
 Terminal=false
 TerminalOptions=
 Type=Application
-X-KDE-SubstituteUID=false
-X-KDE-Username=
