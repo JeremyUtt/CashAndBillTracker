@@ -33,9 +33,9 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 # Compile All imgui CPP files
 lib/imgui.a: $(IMGUI_SRC)
-	cd build && g++ -c $(IMGUI_SRC) -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
-	ar rcs $@ *.o
-	@echo $^ '--> $@
+	cd lib && g++ -c $(IMGUI_SRC) -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
+	ar rcs $@ lib/*.o
+	@echo $^ '-->' $@
 
 
 
