@@ -23,16 +23,20 @@ dynimgui: lib/libimgui.so
 
 # Link objects together
 $(BIN_DIR)/$(TARGET): $(OBJECTS) lib/imgui.a
-	g++ -o $(BIN_DIR)/$(TARGET) $^ $(LIBS)
+	@g++ -o $(BIN_DIR)/$(TARGET) $^ $(LIBS)
+	@echo LD $^ '-->' $@
 
 # Compile All main CPP files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	g++ $(CFLAGS) -o $@ $< 
+	@g++ $(CFLAGS) -o $@ $< 
+	@echo CC $< '-->' $@
 
 # Compile All imgui CPP files
 lib/imgui.a: $(IMGUI_SRC)
 	cd build && g++ -c $(IMGUI_SRC) -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
 	ar rcs $@ *.o
+	@echo $^ '--> $@
+
 
 
 # OTHER
