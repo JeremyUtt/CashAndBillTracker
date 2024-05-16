@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/billTracker",
-            "args": [],
+            "args": ["${workspaceFolder}/examples/1.csv"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],

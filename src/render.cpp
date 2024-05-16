@@ -1,22 +1,42 @@
 #include "render.h"
-#include "logic.h"
+
 #include <GLFW/glfw3.h>
 
 #include <iostream>
 
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
+#include "logic.h"
 
 using namespace std;
 using namespace ImGui;
 
 ImFont* font1;
 ImFont* font2;
+void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items);
+void addUserWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items);
+void addItemWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items);
+
 const vector<string> tags = {"Name:", "Total:", "Users: (Select one or more per item)", "Price Per Person:"};
 
-void loop(GLFWwindow* window, vector<User*>& users, vector<Item*>& items, bool* checkedTable) {
+void loop(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) {
     using namespace ImGui;
+    PushFont(font2);
 
+    mainWindow(window, users, items);
+
+    ImGui::SetNextWindowPos(ImVec2(250, 350), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(250, 125), ImGuiCond_FirstUseEver);
+    addUserWindow(window, users, items);
+
+    ImGui::SetNextWindowPos(ImVec2(700, 350), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(250, 180), ImGuiCond_FirstUseEver);
+    addItemWindow(window, users, items);
+
+    PopFont();
+}
+
+void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) {
     Begin("Fullscreen Window",
           NULL,
           ImGuiWindowFlags_NoResize |
@@ -32,7 +52,6 @@ void loop(GLFWwindow* window, vector<User*>& users, vector<Item*>& items, bool* 
     SetWindowSize(ImVec2(width, height));
     SetWindowPos(ImVec2(0, 0));
 
-    ImGui::PushFont(font2);
     ImGui::PushFont(font1);
     Text("Cost and Bill Tracker");
     ImGui::PopFont();
@@ -42,10 +61,22 @@ void loop(GLFWwindow* window, vector<User*>& users, vector<Item*>& items, bool* 
             TableNextColumn();
             TableHeader(tags[i].c_str());
         }
-        for (size_t i = 0; i < users.size() + 1; i++) {
-            TableHeader("");
+        PushStyleColor(ImGuiCol_Button, ImVec4(.6, 0, 0, 1));
+        PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.8, 0, 0, 1));
+        PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1, 0, 0, 1));
+        for (size_t i = 0; i < users.size(); i++) {
             TableNextColumn();
+            // TableHeader("hi");
+
+            string text = "X: " + users[i]->getName();
+
+            if (Button(text.c_str(), ImVec2(100, 25))) {
+                cout << "Remove User: " << users[i]->getName() << endl;
+                users.erase(users.begin() + i);
+                updateTotals(users, items);
+            }
         }
+        TableNextColumn();
         TableHeader(tags[3].c_str());
 
         // TableNextRow();
@@ -55,24 +86,38 @@ void loop(GLFWwindow* window, vector<User*>& users, vector<Item*>& items, bool* 
             // Create Name coloum
 
             TableNextColumn();
+            if (Button(("X" + to_string(i)).c_str(), ImVec2(25, 25))) {
+                cout << "Remove Item: " << items[i]->getName() << endl;
+                items.erase(items.begin() + i);
+                updateTotals(users, items);
+            }
+            SameLine();
             Text(items[i]->getName().c_str());
 
             // Create Total (2nd) coloum
             TableNextColumn();
             Text(fltToStr(items[i]->getTotalPrice()).c_str());
 
+            vector<User*> usersWithItem = items[i]->getAddedUsers();
+
             // Create Button Objects
             for (size_t j = 0; j < users.size(); j++) {
                 TableNextColumn();
 
-                std::cout << i << " " << j << std::endl;
-
                 string name = users[j]->getName() + "##" + to_string(i * users.size() + j);
 
-                bool clicked = Checkbox(name.c_str(), &checkedTable[i * users.size() + j]);
+                bool checked = false;
+                // check if user is in on the item
+                for (auto user : usersWithItem) {
+                    if (user == users[j]) {
+                        checked = true;
+                        break;
+                    }
+                }
+
+                bool clicked = Checkbox(name.c_str(), &checked);
                 if (clicked) {
-                    std::cout << "Hi" << std::endl;
-                    if (checkedTable[i * users.size() + j]) {
+                    if (checked) {
                         items[i]->addUser(users[j]);
                     } else {
                         items[i]->removeUser(users[j]);
@@ -95,6 +140,9 @@ void loop(GLFWwindow* window, vector<User*>& users, vector<Item*>& items, bool* 
         EndTable();
     }
 
+    PopStyleColor();
+    PopStyleColor();
+    PopStyleColor();
     // Create section that will contain each users total cost
 
     if (BeginTable("totals", 1 + users.size(), ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX)) {
@@ -116,24 +164,52 @@ void loop(GLFWwindow* window, vector<User*>& users, vector<Item*>& items, bool* 
         EndTable();
     }
 
-    // for (size_t i = 0; i < users.size(); i++) {
-    //     // List Everyones names
-    //     sf::Text peopleNames;
-    //     peopleNames.setFont(notoSans);
-    //     peopleNames.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), ITEM_Y_SPACING * (items.size() + 2) + NAME_START_Y);
-    //     peopleNames.setCharacterSize(FONT_SIZE);
-    //     peopleNames.setString(users[i]->getName());
-    //     itemDrawObjects.push_back(peopleNames);
+    End();
+}
 
-    //     // Below each name, print their total price
-    //     sf::Text peopleTotals;
-    //     peopleTotals.setFont(notoSans);
-    //     peopleTotals.setPosition(USER_TOTAL_X + (USER_SPACING_X * i), ITEM_Y_SPACING * (items.size() + 2) + NAME_START_Y + USER_SPACING_Y);
-    //     peopleTotals.setCharacterSize(FONT_SIZE);
-    //     UserTotalUpdateObjects.push_back(peopleTotals);
-    // }
+void addUserWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) {
+    Begin("Add User", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
 
-    ImGui::PopFont();
+    static char name[100];
+
+    ImGui::InputText("Name", name, 100);
+
+    if (Button("Add User", ImVec2(100, 40)) && name[0] != '\0') {
+        cout << "Add User: " << name << endl;
+
+        users.push_back(new User(name, false));
+        updateTotals(users, items);
+
+        for (size_t i = 0; i < 100; i++) {
+            name[i] = '\0';
+        }
+    }
+
+    End();
+}
+
+void addItemWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) {
+    Begin("Add Item", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
+
+    static char name[100];
+    static float price;
+    static int quantity = 1;
+
+    ImGui::InputText("Name", name, 100);
+    ImGui::InputFloat("Price", &price);
+    ImGui::InputInt("Quantity", &quantity);
+
+    if (Button("Add Item", ImVec2(100, 40)) && name[0] != '\0' && quantity > 0 && price > 0) {
+        cout << "Add Item: " << name << endl;
+        items.push_back(new Item(name, price, quantity));
+        updateTotals(users, items);
+
+        for (size_t i = 0; i < 100; i++) {
+            name[i] = '\0';
+            price = 0;
+            quantity = 1;
+        }
+    }
 
     End();
 }

@@ -53,7 +53,7 @@ depend:
 .PHONY: all clean depend
 
 run: all
-	@./$(BIN_DIR)/$(TARGET)
+	@./$(BIN_DIR)/$(TARGET) examples/1.csv
 
 lib/libimgui.so: $(SOURCES)
 	g++ -fPIC -shared $(SOURCES) -o lib/libimgui.so -I$(IMGUI_DIR)

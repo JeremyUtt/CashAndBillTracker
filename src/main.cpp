@@ -43,8 +43,8 @@ const char* title = "Cost and Bill Tracker";
 const int width = 1280;
 const int height = 720;
 const string fontPath = "/home/jeremy/Dev/CBT/NotoSans-Bold.ttf";
-const int titleFontSize = 35;
-const int fontSize = 25;
+const int titleFontSize = 25;
+const int fontSize = 20;
 
 int main(int argc, char** argv) {
     vector<Item*> items;
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
 
     if (argc == 2) {
         readCSV(argv[1], users, items);
-    } else {
+    }/*  else {
         while (true) {
             cout << "How would you like in input the data?" << endl;
             cout << "1. A CSV File, 2. Manually (1,2):";
@@ -83,14 +83,9 @@ int main(int argc, char** argv) {
                 cout << "Invalid choice" << endl;
             }
         }
-    }
+    } */
 
-    std::cout << users.size() * items.size() << std::endl;
-
-    bool* checkedTable = new bool[users.size() * items.size()];
-    for (size_t i = 0; i < users.size() * items.size(); i++) {
-        checkedTable[i] = false;
-    }
+    // std::cout << users.size() * items.size() << std::endl;
 
     if (!glfwInit()) {
         return 1;
@@ -134,7 +129,7 @@ int main(int argc, char** argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        loop(window, users, items, checkedTable);
+        loop(window, users, items);
 
         ImGui::Render();
         int display_w, display_h;
