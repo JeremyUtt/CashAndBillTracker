@@ -35,6 +35,7 @@
 #include "imgui_impl_opengl3.h"
 #include "logic.h"
 #include "render.h"
+#include "nfd.h"
 
 using namespace std;
 using namespace ImGui;
@@ -47,6 +48,33 @@ const int titleFontSize = 25;
 const int fontSize = 20;
 
 int main(int argc, char** argv) {
+   
+   
+    NFD_Init();
+
+    nfdu8char_t *outPath;
+    nfdu8filteritem_t filters[2] = { { "Source code", "c,cpp,cc" }, { "Headers", "h,hpp" } };
+    nfdopendialogu8args_t args = {0};
+    args.filterList = filters;
+    args.filterCount = 2;
+    nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &args);
+    if (result == NFD_OKAY)
+    {
+        puts("Success!");
+        puts(outPath);
+        NFD_FreePathU8(outPath);
+    }
+    else if (result == NFD_CANCEL)
+    {
+        puts("User pressed cancel.");
+    }
+    else 
+    {
+        printf("Error: %s\n", NFD_GetError());
+    }
+
+    NFD_Quit();
+   
     vector<Item*> items;
     vector<User*> users;
 
