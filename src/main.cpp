@@ -30,12 +30,13 @@
 #include <iostream>
 #include <sstream>
 
+#include "csv.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "logic.h"
-#include "render.h"
 #include "nfd.h"
+#include "render.h"
 
 using namespace std;
 using namespace ImGui;
@@ -43,77 +44,21 @@ using namespace ImGui;
 const char* title = "Cost and Bill Tracker";
 const int width = 1280;
 const int height = 720;
-const string fontPath = "/home/jeremy/Dev/CBT/NotoSans-Bold.ttf";
+const string fontPath = "/home/jeremy/Dev/CBT/assets/NotoSans-Bold.ttf";
 const int titleFontSize = 25;
 const int fontSize = 20;
 
 int main(int argc, char** argv) {
-   
-   
-    NFD_Init();
-
-    nfdu8char_t *outPath;
-    nfdu8filteritem_t filters[2] = { { "Source code", "c,cpp,cc" }, { "Headers", "h,hpp" } };
-    nfdopendialogu8args_t args = {0};
-    args.filterList = filters;
-    args.filterCount = 2;
-    nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &args);
-    if (result == NFD_OKAY)
-    {
-        puts("Success!");
-        puts(outPath);
-        NFD_FreePathU8(outPath);
-    }
-    else if (result == NFD_CANCEL)
-    {
-        puts("User pressed cancel.");
-    }
-    else 
-    {
-        printf("Error: %s\n", NFD_GetError());
-    }
-
-    NFD_Quit();
-   
     vector<Item*> items;
     vector<User*> users;
 
-    // Ask user for type of data input
+    NFD_Init();
+    NFD_Quit();
 
+    // Ask user for type of data input
     if (argc == 2) {
         readCSV(argv[1], users, items);
-    }/*  else {
-        while (true) {
-            cout << "How would you like in input the data?" << endl;
-            cout << "1. A CSV File, 2. Manually (1,2):";
-            int choice;
-            cin >> choice;
-            // Check id wrong datatype entered (or other failure)
-            if (cin.fail()) {
-                cin.clear();
-                cout << "Invalid choice" << endl;
-                continue;
-            }
-            if (choice == 1) {
-                // function will modify the users and items vector
-                // Prompt user for file name
-                cout << "Enter Filename:";
-                string fileName;
-                cin >> fileName;
-
-                readCSV(fileName, users, items);
-                break;
-            } else if (choice == 2) {
-                // function will modify the users and items vector
-                readManual(users, items);
-                break;
-            } else {
-                cout << "Invalid choice" << endl;
-            }
-        }
-    } */
-
-    // std::cout << users.size() * items.size() << std::endl;
+    }
 
     if (!glfwInit()) {
         return 1;
@@ -177,42 +122,6 @@ int main(int argc, char** argv) {
 
     glfwDestroyWindow(window);
     glfwTerminate();
-}
-
-void readCSV(string fileName, vector<User*>& users, vector<Item*>& items) {
-    ifstream file(fileName);
-    if (file.fail()) {
-        cerr << "ERROR: File does not exist or is not readable" << endl;
-        exit(-1);
-    }
-
-    // Read user names from the first line of the file
-    // https://favtutor.com/blogs/split-string-cpp
-    string names;
-    getline(file, names, '\n');
-    stringstream nameStream(names);
-
-    // Create User objects based on the names
-    // https://stackoverflow.com/questions/10376199/how-can-i-use-non-default-delimiters-when-reading-a-text-file-with-stdfstream
-    string uName;
-    bool getBuyer = true;
-    while (getline(nameStream, uName, ',')) {
-        User* buyer = new User(uName, getBuyer);
-        getBuyer = false;
-        users.push_back(buyer);
-    }
-
-    // Read item details from the remaining lines of the file
-    string iName, price, quantity;
-    while (getline(file, iName, ',')) {
-        getline(file, price, ',');
-        getline(file, quantity, '\n');
-
-        // https://www.programiz.com/cpp-programming/string-float-conversion
-        Item* item = new Item(iName, stof(price), stoi(quantity));
-        items.push_back(item);
-    }
-    file.close();
 }
 
 void readManual(vector<User*>& users, vector<Item*>& items) {

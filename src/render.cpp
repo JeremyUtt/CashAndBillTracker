@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include "csv.h"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "logic.h"
@@ -16,6 +17,7 @@ ImFont* font2;
 void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items);
 void addUserWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items);
 void addItemWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items);
+string openCSV();
 
 const vector<string> tags = {"Name:", "Total:", "Users: (Select one or more per item)", "Price Per Person:"};
 
@@ -25,12 +27,12 @@ void loop(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) {
 
     mainWindow(window, users, items);
 
-    ImGui::SetNextWindowPos(ImVec2(250, 350), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(250, 125), ImGuiCond_FirstUseEver);
+    SetNextWindowPos(ImVec2(250, 350), ImGuiCond_FirstUseEver);
+    SetNextWindowSize(ImVec2(250, 125), ImGuiCond_FirstUseEver);
     addUserWindow(window, users, items);
 
-    ImGui::SetNextWindowPos(ImVec2(700, 350), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(250, 180), ImGuiCond_FirstUseEver);
+    SetNextWindowPos(ImVec2(700, 350), ImGuiCond_FirstUseEver);
+    SetNextWindowSize(ImVec2(250, 180), ImGuiCond_FirstUseEver);
     addItemWindow(window, users, items);
 
     PopFont();
@@ -52,19 +54,29 @@ void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) 
     SetWindowSize(ImVec2(width, height));
     SetWindowPos(ImVec2(0, 0));
 
-    ImGui::PushFont(font1);
+    PushFont(font1);
     Text("Cost and Bill Tracker");
-    ImGui::PopFont();
+    PopFont();
+
+    if (Button("Load From CSV", ImVec2(150, 40))) {
+        string result = openCSV();
+        if (result != "") {
+            users.clear();
+            items.clear();
+            readCSV(result, users, items);
+            updateTotals(users, items);
+        }
+    }
 
     if (BeginTable("main", 3 + users.size(), ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX)) {
-        for (size_t i = 0; i < 2; i++) {
+        for (std::size_t i = 0; i < 2; i++) {
             TableNextColumn();
             TableHeader(tags[i].c_str());
         }
         PushStyleColor(ImGuiCol_Button, ImVec4(.6, 0, 0, 1));
         PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.8, 0, 0, 1));
         PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1, 0, 0, 1));
-        for (size_t i = 0; i < users.size(); i++) {
+        for (std::size_t i = 0; i < users.size(); i++) {
             TableNextColumn();
             // TableHeader("hi");
 
@@ -82,7 +94,7 @@ void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) 
         // TableNextRow();
 
         // Repeat for every item in the list
-        for (size_t i = 0; i < items.size(); i++) {
+        for (std::size_t i = 0; i < items.size(); i++) {
             // Create Name coloum
 
             TableNextColumn();
@@ -101,7 +113,7 @@ void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) 
             vector<User*> usersWithItem = items[i]->getAddedUsers();
 
             // Create Button Objects
-            for (size_t j = 0; j < users.size(); j++) {
+            for (std::size_t j = 0; j < users.size(); j++) {
                 TableNextColumn();
 
                 string name = users[j]->getName() + "##" + to_string(i * users.size() + j);
@@ -140,9 +152,9 @@ void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) 
         EndTable();
     }
 
-    PopStyleColor();
-    PopStyleColor();
-    PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
+    ImGui::PopStyleColor();
     // Create section that will contain each users total cost
 
     if (BeginTable("totals", 1 + users.size(), ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX)) {
@@ -158,7 +170,7 @@ void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) 
         // Show USers total
         for (auto user : users) {
             TableNextColumn();
-            Text(fltToStr(user->getTotal()).c_str());
+            ImGui::Text(fltToStr(user->getTotal()).c_str());
         }
 
         EndTable();
@@ -180,7 +192,7 @@ void addUserWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& item
         users.push_back(new User(name, false));
         updateTotals(users, items);
 
-        for (size_t i = 0; i < 100; i++) {
+        for (std::size_t i = 0; i < 100; i++) {
             name[i] = '\0';
         }
     }
@@ -204,7 +216,7 @@ void addItemWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& item
         items.push_back(new Item(name, price, quantity));
         updateTotals(users, items);
 
-        for (size_t i = 0; i < 100; i++) {
+        for (std::size_t i = 0; i < 100; i++) {
             name[i] = '\0';
             price = 0;
             quantity = 1;

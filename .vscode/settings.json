@@ -81,7 +81,9 @@
         "shared_mutex": "cpp",
         "cfenv": "cpp",
         "typeindex": "cpp",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "hash_map": "cpp",
+        "text_encoding": "cpp"
     },
     "cSpell.words": [
         "SFML"

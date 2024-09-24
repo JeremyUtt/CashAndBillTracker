@@ -10,3 +10,4 @@ void readManual(std::vector<User*>& users, std::vector<Item*>& items);
 void readCSV(std::string filename,std::vector<User*>& users, std::vector<Item*>& items);
 std::string fltToStr(float num);
 void updateTotals(std::vector<User*>& users, std::vector<Item*>& items);
+std::string openCSV();
