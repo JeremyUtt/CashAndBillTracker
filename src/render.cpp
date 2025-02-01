@@ -10,7 +10,7 @@
 #include "logic.h"
 
 using namespace std;
-using namespace ImGui;
+
 
 ImFont* font1;
 ImFont* font2;
@@ -19,46 +19,47 @@ void addUserWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& item
 void addItemWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items);
 string openCSV();
 
-const vector<string> tags = {"Name:", "Total:", "Users: (Select one or more per item)", "Price Per Person:"};
+bool incomplete = false;
+
+const vector<string> tags = {"Item", "Price Per", "Quantity", "Total", "Price Per Person:", "Tax", "Tax Per", "Tax Total"};
 
 void loop(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) {
-    using namespace ImGui;
-    PushFont(font2);
+
+    ImGui::PushFont(font2);
 
     mainWindow(window, users, items);
 
-    SetNextWindowPos(ImVec2(250, 350), ImGuiCond_FirstUseEver);
-    SetNextWindowSize(ImVec2(250, 125), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImVec2(250, 350), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(250, 125), ImGuiCond_FirstUseEver);
     addUserWindow(window, users, items);
 
-    SetNextWindowPos(ImVec2(700, 350), ImGuiCond_FirstUseEver);
-    SetNextWindowSize(ImVec2(250, 180), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImVec2(700, 350), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(250, 180), ImGuiCond_FirstUseEver);
     addItemWindow(window, users, items);
 
-    PopFont();
+    ImGui::PopFont();
 }
 
 void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) {
-    Begin("Fullscreen Window",
+    ImGui::Begin("Fullscreen Window",
           NULL,
           ImGuiWindowFlags_NoResize |
               ImGuiWindowFlags_NoMove |
               ImGuiWindowFlags_NoCollapse |
               ImGuiWindowFlags_NoTitleBar |
               ImGuiWindowFlags_NoBringToFrontOnFocus);
-    // Begin("Table");
 
     int width, height;
     glfwGetWindowSize(window, &width, &height);
 
-    SetWindowSize(ImVec2(width, height));
-    SetWindowPos(ImVec2(0, 0));
+    ImGui::SetWindowSize(ImVec2(width, height));
+    ImGui::SetWindowPos(ImVec2(0, 0));
 
-    PushFont(font1);
-    Text("Cost and Bill Tracker");
-    PopFont();
+    ImGui::PushFont(font1);
+    ImGui::Text("Cost and Bill Tracker");
+    ImGui::PopFont();
 
-    if (Button("Load From CSV", ImVec2(150, 40))) {
+    if (ImGui::Button("Load From CSV", ImVec2(150, 40))) {
         string result = openCSV();
         if (result != "") {
             users.clear();
@@ -68,53 +69,69 @@ void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) 
         }
     }
 
-    if (BeginTable("main", 3 + users.size(), ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX)) {
-        for (std::size_t i = 0; i < 2; i++) {
-            TableNextColumn();
-            TableHeader(tags[i].c_str());
+    if (ImGui::BeginTable("main", tags.size() + users.size(), ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX)) {
+        incomplete = false;
+        // Create Button Style
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(.6, 0, 0, 1));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.8, 0, 0, 1));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1, 0, 0, 1));
+        
+        // Add first 4 column headers
+        for (std::size_t i = 0; i < 4; i++) {
+            ImGui::TableNextColumn();
+            ImGui::TableHeader(tags[i].c_str());
         }
-        PushStyleColor(ImGuiCol_Button, ImVec4(.6, 0, 0, 1));
-        PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(.8, 0, 0, 1));
-        PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1, 0, 0, 1));
+        
+        // Add User Column Headers
         for (std::size_t i = 0; i < users.size(); i++) {
-            TableNextColumn();
+            ImGui::TableNextColumn();
             // TableHeader("hi");
 
-            string text = "X: " + users[i]->getName();
-
-            if (Button(text.c_str(), ImVec2(100, 25))) {
+            string text = "X##" + users[i]->getName();
+            if (ImGui::Button(text.c_str(), ImVec2(25, 25))) {
                 cout << "Remove User: " << users[i]->getName() << endl;
                 users.erase(users.begin() + i);
                 updateTotals(users, items);
             }
+            ImGui::SameLine();
+            ImGui::Text(users[i]->getName().c_str());
         }
-        TableNextColumn();
-        TableHeader(tags[3].c_str());
+        
+        // Add rest of column header
+        for (std::size_t i = 4; i < tags.size(); i++) {
+            ImGui::TableNextColumn();
+            ImGui::TableHeader(tags[i].c_str());
+        }
 
-        // TableNextRow();
-
-        // Repeat for every item in the list
+        // Create remaining rows
         for (std::size_t i = 0; i < items.size(); i++) {
             // Create Name coloum
 
-            TableNextColumn();
-            if (Button(("X" + to_string(i)).c_str(), ImVec2(25, 25))) {
+            ImGui::TableNextColumn();
+            if (ImGui::Button(("X##item" + to_string(i)).c_str(), ImVec2(25, 25))) {
                 cout << "Remove Item: " << items[i]->getName() << endl;
                 items.erase(items.begin() + i);
                 updateTotals(users, items);
             }
-            SameLine();
-            Text(items[i]->getName().c_str());
+            ImGui::SameLine();
+            ImGui::Text(items[i]->getName().c_str());
 
-            // Create Total (2nd) coloum
-            TableNextColumn();
-            Text(fltToStr(items[i]->getTotalPrice()).c_str());
+            // Create Price Per (2nd) column
+            ImGui::TableNextColumn();
+            ImGui::Text(fltToStr(items[i]->getPricePerQuantity()).c_str());
+
+            // Create Quantity (3rd) column
+            ImGui::TableNextColumn();
+            ImGui::Text(std::to_string(items[i]->getQuantity()).c_str());
+
+            // Create Total (4th) column
+            ImGui::TableNextColumn();
+            ImGui::Text(fltToStr(items[i]->getTotalPrice()).c_str());
 
             vector<User*> usersWithItem = items[i]->getAddedUsers();
-
             // Create Button Objects
             for (std::size_t j = 0; j < users.size(); j++) {
-                TableNextColumn();
+                ImGui::TableNextColumn();
 
                 string name = users[j]->getName() + "##" + to_string(i * users.size() + j);
 
@@ -127,7 +144,7 @@ void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) 
                     }
                 }
 
-                bool clicked = Checkbox(name.c_str(), &checked);
+                bool clicked = ImGui::Checkbox(name.c_str(), &checked);
                 if (clicked) {
                     if (checked) {
                         items[i]->addUser(users[j]);
@@ -138,55 +155,128 @@ void mainWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) 
                 }
             }
 
-            // Create Price Per Person (last) column
+            // Create Price Per Person column
+            ImGui::TableNextColumn();
             string text = fltToStr(items[i]->pricePerPerson());
             if (text == "$inf") {
                 text = "Select at least one person";
+                incomplete = true;
+            }
+            ImGui::Text(text.c_str());
+
+            // Create Tax button column
+            ImGui::TableNextColumn();
+            string name = "##" + items[i]->getName();
+            // check if tax is applied
+            bool checked = false;
+            if (items[i]->hasTax()) {
+                checked = true;
+            }
+            bool clicked = ImGui::Checkbox(name.c_str(), &checked);
+            if (clicked) {
+                items[i]->setTax(checked);
+                updateTotals(users, items);
             }
 
-            TableNextColumn();
-            Text(text.c_str());
+            // Create Tax Per Person column
+            ImGui::TableNextColumn();
+            text = fltToStr(items[i]->taxPerPerson());
+            if (text == "$inf") {
+                text = "Select at least one person";
+            }
+            ImGui::Text(text.c_str());
 
-            // TableNextRow();
+            // Create Tax Total column
+            ImGui::TableNextColumn();
+            ImGui::Text(fltToStr(items[i]->getTax()).c_str());
+
+
+
+
         }
-        EndTable();
+        
+        ImGui::EndTable();
+
+        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
+        ImGui::PopStyleColor();
     }
 
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
-    ImGui::PopStyleColor();
+
     // Create section that will contain each users total cost
-
-    if (BeginTable("totals", 1 + users.size(), ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX)) {
-        TableNextColumn();
-
-        TableHeader("User:");
-        for (auto user : users) {
-            TableNextColumn();
-            TableHeader(user->getName().c_str());
-        }
-        TableNextColumn();
-        Text("Total:");
-        // Show USers total
-        for (auto user : users) {
-            TableNextColumn();
-            ImGui::Text(fltToStr(user->getTotal()).c_str());
+    if (ImGui::BeginTable("totals", 2 + users.size(), ImGuiTableFlags_Borders | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_NoHostExtendX)) {
+        
+        if (incomplete) {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 0, 0, 1));
         }
 
-        EndTable();
+        float subtotal = 0;
+        float tax = 0;
+        float total = 0;
+        
+        for (auto item : items) {
+            subtotal += item->getTotalPrice();
+            total += item->getTotalPrice();
+            if (item->hasTax()) {
+                tax += item->getTax();
+                total += item->getTax();
+            }
+        }
+        
+        ImGui::TableNextColumn();
+
+        ImGui::TableHeader("User:");
+        for (auto user : users) {
+            ImGui::TableNextColumn();
+            ImGui::TableHeader(user->getName().c_str());
+        }
+        ImGui::TableNextColumn();
+        ImGui::TableHeader("Total");
+        ImGui::TableNextColumn();
+        
+        ImGui::Text("Sub Total:");
+        for (auto user : users) {
+            ImGui::TableNextColumn();
+            ImGui::Text(fltToStr(user->getSubTotal()).c_str());
+        }
+        ImGui::TableNextColumn();
+        ImGui::Text(fltToStr(subtotal).c_str());
+        ImGui::TableNextColumn();
+
+        ImGui::Text("Tax:");
+        for (auto user : users) {
+            ImGui::TableNextColumn();
+            ImGui::Text(fltToStr(user->getTax()).c_str());
+        }
+        ImGui::TableNextColumn();
+        ImGui::Text(fltToStr(tax).c_str());
+        ImGui::TableNextColumn();
+        
+        ImGui::Text("Total:");
+        for (auto user : users) {
+            ImGui::TableNextColumn();
+            ImGui::Text(fltToStr(user->getSubTotal() + user->getTax()).c_str());
+        }
+        ImGui::TableNextColumn();
+        ImGui::Text(fltToStr(total).c_str());
+        ImGui::EndTable();
+
+        if (incomplete) {
+            ImGui::PopStyleColor();
+        }
     }
 
-    End();
+    ImGui::End();
 }
 
 void addUserWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) {
-    Begin("Add User", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
+    ImGui::Begin("Add User", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
 
     static char name[100];
 
     ImGui::InputText("Name", name, 100);
 
-    if (Button("Add User", ImVec2(100, 40)) && name[0] != '\0') {
+    if (ImGui::Button("Add User", ImVec2(100, 40)) && name[0] != '\0') {
         cout << "Add User: " << name << endl;
 
         users.push_back(new User(name, false));
@@ -197,11 +287,11 @@ void addUserWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& item
         }
     }
 
-    End();
+    ImGui::End();
 }
 
 void addItemWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& items) {
-    Begin("Add Item", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
+    ImGui::Begin("Add Item", NULL, ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoScrollbar);
 
     static char name[100];
     static float price;
@@ -211,7 +301,7 @@ void addItemWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& item
     ImGui::InputFloat("Price", &price);
     ImGui::InputInt("Quantity", &quantity);
 
-    if (Button("Add Item", ImVec2(100, 40)) && name[0] != '\0' && quantity > 0 && price > 0) {
+    if (ImGui::Button("Add Item", ImVec2(100, 40)) && name[0] != '\0' && quantity > 0 && price > 0) {
         cout << "Add Item: " << name << endl;
         items.push_back(new Item(name, price, quantity));
         updateTotals(users, items);
@@ -223,5 +313,5 @@ void addItemWindow(GLFWwindow* window, vector<User*>& users, vector<Item*>& item
         }
     }
 
-    End();
+    ImGui::End();
 }

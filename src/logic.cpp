@@ -16,7 +16,8 @@ string fltToStr(float num) {
 void updateTotals(vector<User*>& users, vector<Item*>& items) {
     // recalutates per person totals from scratch
     for (size_t i = 0; i < users.size(); i++) {
-        users[i]->setTotal(0);
+        users[i]->setSubTotal(0);
+        users[i]->setTax(0);
     }
 
     for (size_t i = 0; i < items.size(); i++) {
@@ -24,7 +25,11 @@ void updateTotals(vector<User*>& users, vector<Item*>& items) {
         auto price = items[i]->pricePerPerson();
         // For each participating user, add the items pricePerPerson() to their total
         for (size_t j = 0; j < addedUsers.size(); j++) {
-            addedUsers[j]->setTotal(addedUsers[j]->getTotal() + price);
+            addedUsers[j]->setSubTotal(addedUsers[j]->getSubTotal() + price);
+            // tax
+            if (items[i]->hasTax()) {
+                addedUsers[j]->setTax(addedUsers[j]->getTax() + items[i]->taxPerPerson());
+            }
         }
     }
 

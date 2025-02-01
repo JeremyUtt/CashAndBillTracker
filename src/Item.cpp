@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+const float TAX_RATE = 0.18;
+
 Item::Item(std::string name, float pricePerQuantity, int quantity) {
     this->_name = name;
     this->_pricePerQuantity = pricePerQuantity;
@@ -70,4 +72,29 @@ std::vector<User*> Item::getAddedUsers() const {
 
 double Item::pricePerPerson() const {
     return getTotalPrice() / _users.size();
+}
+
+bool Item::hasTax() const {
+    return _tax;
+}
+
+void Item::setTax(bool tax) {
+    _tax = tax;
+}
+
+float Item::getTax() const {
+
+    if (!_tax) {
+        return 0;
+    }
+    return getTotalPrice() * TAX_RATE;
+}
+
+double Item::taxPerPerson() const {
+    
+    if (!_tax) {
+        return 0;
+    }
+
+    return getTax() / _users.size();
 }

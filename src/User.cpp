@@ -24,10 +24,18 @@ bool User::getBuyerStatus() const {
     return _isBuyer;
 }
 
-void User::setTotal(double total) {
+void User::setSubTotal(double total) {
     this->_currentTotal = total;
 }
 
-double User::getTotal() const {
+double User::getSubTotal() const {
     return this->_currentTotal;
+}
+
+double User::getTax() const {
+    return _tax;
+}
+
+void User::setTax(double tax) {
+    this->_tax = tax;
 }

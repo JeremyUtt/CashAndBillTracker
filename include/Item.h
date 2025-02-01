@@ -10,6 +10,7 @@ private:
     float _pricePerQuantity;
     int _quantity;
     std::vector<User*> _users;
+    bool _tax = false;
 
 public:
     // Constructor
@@ -32,4 +33,9 @@ public:
     std::vector<User*> getAddedUsers() const;
     double pricePerPerson() const;
     // void updateUserTotals();
+
+    bool hasTax() const;
+    void setTax(bool tax);
+    float getTax() const;
+    double taxPerPerson() const;
 };
